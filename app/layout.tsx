@@ -4,9 +4,9 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "DetectLab — Detection Engineering Platform",
+  title: "AIDetectLab — Detection Engineering Platform",
   description:
-    "A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark.",
+    "A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark — with a dedicated AI Security layer.",
 };
 
 export default function RootLayout({

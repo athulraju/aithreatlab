@@ -8,7 +8,10 @@
       "Read(//Users/mydev/.nvm/versions/**)",
       "Read(//Users/mydev/**)",
       "Bash(export PATH=\"$PATH:/usr/local/bin:/opt/homebrew/bin\")",
-      "Bash(defaults read:*)"
+      "Bash(defaults read:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(/opt/homebrew/bin/node /Users/mydev/Desktop/detection-engineering-site/node_modules/.bin/tsc --noEmit)"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Shield, Github, Twitter } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
@@ -8,13 +8,8 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-semibold text-white text-sm">
-                Detect<span className="text-cyan-400">Lab</span>
-              </span>
+            <div className="mb-4">
+              <Logo />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
               A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark.
@@ -64,7 +59,7 @@ export function Footer() {
 
         <div className="border-t border-white/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-600">
-            © 2024 DetectLab. Detection engineering platform.
+            © 2025 AIDetectLab. Detection engineering platform.
           </p>
           <div className="flex items-center gap-4">
             <span className="text-xs text-gray-600">Built for defenders.</span>

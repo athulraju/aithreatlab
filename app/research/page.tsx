@@ -1,150 +1,108 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
-import { articles, articleCategories } from "@/lib/data/research";
-import { formatDate } from "@/lib/utils";
-import { Clock, ChevronRight, Star } from "lucide-react";
-
-const categoryColors: Record<string, string> = {
-  "Detection Engineering": "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
-  "AI Security": "text-purple-400 bg-purple-400/10 border-purple-400/20",
-  "Insider Threat": "text-orange-400 bg-orange-400/10 border-orange-400/20",
-  "Sigma Portability": "text-blue-400 bg-blue-400/10 border-blue-400/20",
-  "PySpark Detections": "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
-  "Class Imbalance": "text-red-400 bg-red-400/10 border-red-400/20",
-  "Agent Detection": "text-violet-400 bg-violet-400/10 border-violet-400/20",
-};
+import { researchSections, sectionColors, sourceColors } from "@/lib/data/research";
+import { ExternalLink } from "lucide-react";
 
 export default function ResearchPage() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [activeSection, setActiveSection] = useState<string>("all");
 
-  const filtered = articles.filter(
-    (a) => selectedCategory === "All" || a.category === selectedCategory
-  );
-
-  const featured = filtered.filter((a) => a.featured);
-  const regular = filtered.filter((a) => !a.featured);
+  const visibleSections =
+    activeSection === "all"
+      ? researchSections
+      : researchSections.filter((s) => s.id === activeSection);
 
   return (
     <div className="pt-14 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <PageHeader
           eyebrow="Research"
-          title="Detection Engineering Research"
-          description="Technical articles on detection engineering, AI security, PySpark analytics, and security ML."
+          title="Research Reference"
+          description="Curated papers, reports, and resources across AI security, agentic AI, detection engineering, and LLM security."
         />
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {articleCategories.map((cat) => (
+        {/* Section filter tabs */}
+        <div className="flex flex-wrap gap-2 mb-10">
+          <button
+            onClick={() => setActiveSection("all")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
+              activeSection === "all"
+                ? "bg-white/10 border-white/20 text-white"
+                : "bg-transparent border-white/[0.08] text-gray-500 hover:text-gray-300 hover:border-white/15"
+            }`}
+          >
+            All
+          </button>
+          {researchSections.map((section) => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
-                selectedCategory === cat
+                activeSection === section.id
                   ? "bg-white/10 border-white/20 text-white"
                   : "bg-transparent border-white/[0.08] text-gray-500 hover:text-gray-300 hover:border-white/15"
               }`}
             >
-              {cat}
+              {section.title}
             </button>
           ))}
         </div>
 
-        {/* Featured Articles */}
-        {featured.length > 0 && (
-          <div className="mb-10">
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-4">Featured</p>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {featured.map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/research/${article.id}`}
-                  className="card-surface-hover p-6 group block"
+        {/* Sections */}
+        <div className="space-y-10">
+          {visibleSections.map((section) => (
+            <div key={section.id}>
+              {/* Section header */}
+              <div className="flex items-center gap-3 mb-4">
+                <span
+                  className={`inline-flex items-center text-xs font-semibold border rounded px-2.5 py-1 ${
+                    sectionColors[section.id] ?? "text-gray-400 bg-white/5 border-white/10"
+                  }`}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <span
-                      className={`inline-flex items-center text-xs font-medium border rounded px-2 py-0.5 ${
-                        categoryColors[article.category] || "text-gray-400 bg-white/5 border-white/10"
-                      }`}
-                    >
-                      {article.category}
-                    </span>
-                    <Star className="w-3.5 h-3.5 text-yellow-400/50 flex-shrink-0" />
-                  </div>
+                  {section.title}
+                </span>
+                <span className="text-xs text-gray-600">{section.links.length} references</span>
+              </div>
 
-                  <h3 className="text-sm font-semibold text-white mb-2.5 group-hover:text-cyan-300 transition-colors leading-snug">
-                    {article.title}
-                  </h3>
-
-                  <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-3">
-                    {article.summary}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-xs text-gray-600">
-                      <span>{formatDate(article.date)}</span>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {article.readTime} min
-                      </div>
-                    </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-600 group-hover:text-cyan-400 transition-colors" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Regular Articles */}
-        {regular.length > 0 && (
-          <div>
-            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-4">All Articles</p>
-            <div className="space-y-3">
-              {regular.map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/research/${article.id}`}
-                  className="card-surface-hover p-5 group block"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-2">
-                        <span
-                          className={`inline-flex items-center text-xs font-medium border rounded px-2 py-0.5 ${
-                            categoryColors[article.category] || "text-gray-400 bg-white/5 border-white/10"
-                          }`}
-                        >
-                          {article.category}
-                        </span>
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <Clock className="w-3 h-3" />
-                          {article.readTime} min read
+              {/* Paper list */}
+              <div className="space-y-2">
+                {section.links.map((link, i) => (
+                  <a
+                    key={i}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block card-surface-hover p-4 group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start gap-2 mb-1">
+                          <h3 className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors leading-snug flex-1">
+                            {link.title}
+                          </h3>
+                          <ExternalLink className="w-3.5 h-3.5 text-gray-600 group-hover:text-cyan-400 flex-shrink-0 mt-0.5 transition-colors" />
                         </div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span
+                            className={`inline-flex items-center text-xs border rounded px-1.5 py-0.5 ${
+                              sourceColors[link.source] ?? "text-gray-500 bg-white/5 border-white/10"
+                            }`}
+                          >
+                            {link.source}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          {link.description}
+                        </p>
                       </div>
-                      <h3 className="text-sm font-semibold text-white mb-1.5 group-hover:text-cyan-300 transition-colors">
-                        {article.title}
-                      </h3>
-                      <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{article.summary}</p>
                     </div>
-                    <div className="flex-shrink-0">
-                      <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-cyan-400 mt-1 transition-colors" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-
-        {filtered.length === 0 && (
-          <div className="text-center py-16 text-gray-600">
-            <p className="text-sm">No articles in this category yet.</p>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
     </div>
   );
