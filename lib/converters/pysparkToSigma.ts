@@ -103,7 +103,7 @@ function extractPySparkFilters(code: string): string[] {
     conditions.push(`${camelCase(match[1])}: '${match[2]}'`);
   }
 
-  return [...new Set(conditions)];
+  return Array.from(new Set(conditions));
 }
 
 function camelCase(str: string): string {

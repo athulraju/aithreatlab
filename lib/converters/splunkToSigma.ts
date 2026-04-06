@@ -116,7 +116,7 @@ function extractSplunkConditions(splunk: string): string[] {
     }
   }
 
-  return [...new Set(conditions)];
+  return Array.from(new Set(conditions));
 }
 
 function generateId(): string {

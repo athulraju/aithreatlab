@@ -315,8 +315,8 @@ function scoreDetection(rule: string): QualityScore {
   const total = completeness + clarity + filtering + bestPractice + operability;
 
   // Deduplicate
-  const uniqueStrengths = [...new Set(strengths)].slice(0, 4);
-  const uniqueImprovements = [...new Set(improvements)].slice(0, 4);
+  const uniqueStrengths = Array.from(new Set(strengths)).slice(0, 4);
+  const uniqueImprovements = Array.from(new Set(improvements)).slice(0, 4);
 
   return { total, breakdown, strengths: uniqueStrengths, improvements: uniqueImprovements };
 }
