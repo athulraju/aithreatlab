@@ -13,7 +13,9 @@
       "Bash(node_modules/.bin/tsc --noEmit)",
       "Bash(/opt/homebrew/bin/node /Users/mydev/Desktop/detection-engineering-site/node_modules/.bin/tsc --noEmit)",
       "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
-      "Bash(grep -o \"className=\\\\\".*card-surface.*\\\\\"\" /Users/mydev/Desktop/detection-engineering-site/app/**/*.tsx)"
+      "Bash(grep -o \"className=\\\\\".*card-surface.*\\\\\"\" /Users/mydev/Desktop/detection-engineering-site/app/**/*.tsx)",
+      "Bash(npm run:*)",
+      "Bash(python3:*)"
     ]
   }
 }

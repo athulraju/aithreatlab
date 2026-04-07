@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/detections", label: "Detections" },
   { href: "/coverage", label: "Coverage" },
   { href: "/ai-security", label: "AI Security" },
+  { href: "/agent-skills", label: "Agent Skills" },
   { href: "/playground", label: "Playground" },
   { href: "/research", label: "Research" },
   { href: "/about", label: "About" },
