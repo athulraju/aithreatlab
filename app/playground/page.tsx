@@ -26,35 +26,48 @@ const scenarios: { id: Scenario; label: string; description: string }[] = [
 ];
 
 const sampleQueries: Record<Scenario, string> = {
-  exfiltration: `// Detection: Data Exfiltration via Large File Transfer
-// Scenario: User transferred 2.3GB to external IP in 5 minutes
+  exfiltration: `-- Detection: Data Exfiltration via Large File Transfer
+-- Scenario: User transferred 2.3 GB to an external IP within 5 minutes
+-- Platform : PySpark + Spark SQL
+-- Severity : Critical
 
-// Query Logic (Splunk SPL style):
-// index=network sourcetype=firewall
-//   bytes_out > 500000000
-//   NOT dest_ip IN ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
-// | stats sum(bytes_out) as total_bytes by src_ip, dest_ip, user
-// | where total_bytes > 1073741824
-// | eval gb_out = round(total_bytes / 1073741824, 2)
-// | sort -total_bytes
-
-// PySpark implementation:
-from pyspark.sql.functions import col, sum as spark_sum, round as spark_round
-
-df_filtered = df.filter(
-    (col("bytes_out") > 500_000_000) &
-    (~col("dest_ip").startswith("10.")) &
-    (~col("dest_ip").startswith("192.168.")) &
-    (~col("dest_ip").startswith("172.16."))
-)
-
-detections = df_filtered.groupBy("src_ip", "dest_ip", "user").agg(
-    spark_sum("bytes_out").alias("total_bytes")
-).filter(
-    col("total_bytes") > 1_073_741_824
-).withColumn(
-    "gb_out", spark_round(col("total_bytes") / 1_073_741_824, 2)
-).orderBy(col("total_bytes").desc())`,
+spark.sql("""
+    SELECT
+        src_ip,
+        dest_ip,
+        user,
+        SUM(bytes_out)                              AS total_bytes,
+        ROUND(SUM(bytes_out) / 1073741824.0, 2)    AS gb_out,
+        COUNT(*)                                    AS connection_count,
+        MIN(timestamp)                              AS first_seen,
+        MAX(timestamp)                              AS last_seen
+    FROM network_firewall_logs
+    WHERE
+        -- Exclude RFC-1918 private ranges (always approved egress)
+        dest_ip NOT LIKE '10.%'
+        AND dest_ip NOT LIKE '192.168.%'
+        AND dest_ip NOT LIKE '172.16.%'
+        AND dest_ip NOT LIKE '172.17.%'
+        AND dest_ip NOT LIKE '172.18.%'
+        AND dest_ip NOT LIKE '172.19.%'
+        AND dest_ip NOT LIKE '172.2%.%'
+        AND dest_ip NOT LIKE '172.30.%'
+        AND dest_ip NOT LIKE '172.31.%'
+        AND dest_ip NOT LIKE '127.%'
+        -- Only examine significant individual flows
+        AND bytes_out > 10000000
+        -- Rolling 10-minute window (partition by session if available)
+        AND timestamp >= NOW() - INTERVAL 10 MINUTES
+    GROUP BY
+        src_ip,
+        dest_ip,
+        user
+    HAVING
+        -- Alert when aggregate outbound exceeds 500 MB in the window
+        SUM(bytes_out) > 524288000
+    ORDER BY
+        total_bytes DESC
+""")`,
 
   "login-anomaly": `// Detection: Impossible Travel + MFA Fatigue
 // Scenario: Auth from NY then London within 90 minutes + 12 MFA denials
