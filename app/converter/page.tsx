@@ -8,7 +8,8 @@ import { sigmaToSplunk, ConversionResult } from "@/lib/converters/sigmaToSplunk"
 import { sigmaToPySpark } from "@/lib/converters/sigmaToPySpark";
 import { splunkToSigma } from "@/lib/converters/splunkToSigma";
 import { pysparkToSigma } from "@/lib/converters/pysparkToSigma";
-import { detections } from "@/lib/data/detections";
+import { sigmaSample, splunkSample, pysparkSample } from "@/lib/converters/samples";
+import { detections } from "@/lib/data/detections/index";
 import {
   ArrowRight,
   Copy,
@@ -45,9 +46,9 @@ const monacoLang: Record<Format, string> = {
 };
 
 const sampleInputs: Record<Format, string> = {
-  sigma: detections[0].sigma,
-  splunk: detections[0].splunk,
-  pyspark: detections[0].pyspark,
+  sigma: sigmaSample,
+  splunk: splunkSample,
+  pyspark: pysparkSample,
 };
 
 const availableConversions: Record<Format, Format[]> = {

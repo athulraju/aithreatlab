@@ -9,7 +9,7 @@ import {
   categories,
   platforms,
   maturityLevels,
-} from "@/lib/data/detections";
+} from "@/lib/data/detections/index";
 import { severityColor, maturityColor, platformColor, cn } from "@/lib/utils";
 import { Search, ChevronRight, Filter } from "lucide-react";
 

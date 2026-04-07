@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { detections } from "@/lib/data/detections";
+import { detections } from "@/lib/data/detections/index";
 import { coverageData, coverageLayers } from "@/lib/data/coverage";
 import { motion } from "framer-motion";
 import {

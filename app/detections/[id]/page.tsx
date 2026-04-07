@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import dynamic from "next/dynamic";
-import { getDetectionById } from "@/lib/data/detections";
+import { getDetectionById } from "@/lib/data/detections/index";
 import { severityColor, maturityColor, platformColor, formatDate } from "@/lib/utils";
 import {
   ArrowLeft,
