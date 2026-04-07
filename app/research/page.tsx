@@ -10,7 +10,7 @@ const ease = [0.25, 0.1, 0.25, 1] as const;
 
 export default function ResearchPage() {
   const [activeSection, setActiveSection] = useState<string>("all");
-  useEffect(() => { document.title = "Research — AIDetectLab"; }, []);
+  useEffect(() => { document.title = "Research | AIDetectLab"; }, []);
 
   const visibleSections =
     activeSection === "all"

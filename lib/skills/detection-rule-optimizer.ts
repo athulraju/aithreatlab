@@ -58,18 +58,18 @@ export const expectedOutput = `{
     "performance_gain_estimate": "38% reduction in scanned rows via early filter reorder"
   },
   "changes_made": [
-    "Added CommandLine|contains: ['http', '-o '] to curl/wget conditions — all TPs contain these; no FPs do",
-    "Added filter_ci for users svc_build and runner — these account for 80% of FP volume",
-    "Moved ParentImage check before Image check — higher selectivity filter now runs first",
-    "Removed '/scp' from Image list — FP analysis shows 100% of scp matches were legitimate file sync jobs; no TPs used scp"
+    "Added CommandLine|contains: ['http', '-o '] to curl/wget conditions; all TPs contain these, no FPs do",
+    "Added filter_ci for users svc_build and runner; these account for 80% of FP volume",
+    "Moved ParentImage check before Image check; higher selectivity filter now runs first",
+    "Removed '/scp' from Image list; FP analysis shows 100% of scp matches were legitimate file sync jobs, no TPs used scp"
   ],
-  "optimized_rule": "title: Optimized — AI Agent Spawning Network Transfer Tool\\nid: asi02-oci-linux-001-opt\\nstatus: experimental\\nlogsource:\\n  product: linux\\n  category: process_creation\\ndetection:\\n  selection_parent:\\n    ParentImage|endswith: ['/python3', '/node']\\n  selection_child:\\n    Image|endswith: ['/curl', '/wget', '/nc']\\n  selection_args:\\n    CommandLine|contains: ['http', '-o ']\\n  filter_ci:\\n    User: ['svc_build', 'runner', 'github-actions']\\n  condition: selection_parent and selection_child and selection_args and not filter_ci\\nlevel: high",
+  "optimized_rule": "title: Optimized: AI Agent Spawning Network Transfer Tool\\nid: asi02-oci-linux-001-opt\\nstatus: experimental\\nlogsource:\\n  product: linux\\n  category: process_creation\\ndetection:\\n  selection_parent:\\n    ParentImage|endswith: ['/python3', '/node']\\n  selection_child:\\n    Image|endswith: ['/curl', '/wget', '/nc']\\n  selection_args:\\n    CommandLine|contains: ['http', '-o ']\\n  filter_ci:\\n    User: ['svc_build', 'runner', 'github-actions']\\n  condition: selection_parent and selection_child and selection_args and not filter_ci\\nlevel: high",
   "evasion_gaps_remaining": [
-    "Agent using Python requests library directly (no child process) — requires network telemetry rule",
-    "Agent using ncat alias instead of nc — add '/ncat' to Image list"
+    "Agent using Python requests library directly (no child process); requires network telemetry rule",
+    "Agent using ncat alias instead of nc; add '/ncat' to Image list"
   ],
   "assumptions": [
-    "tp_coverage reduction from 94% to 93% reflects the scp removal — 1 TP used scp, judged acceptable",
+    "tp_coverage reduction from 94% to 93% reflects the scp removal; 1 TP used scp, judged acceptable",
     "github-actions added to filter_ci based on FP example user field values"
   ]
 }`;

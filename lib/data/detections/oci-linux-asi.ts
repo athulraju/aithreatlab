@@ -5,7 +5,7 @@ export const asiDetections: Detection[] = [
     id: "asi01-oci-linux-001",
     title: "AI Agent Spawning Shell Interpreter",
     description:
-      "Detects AI agent runtimes (Python, Node) spawning interactive shell interpreters — a strong indicator of agent goal hijacking, prompt injection leading to code execution, or unsafe tool invocation.",
+      "Detects AI agent runtimes (Python, Node) spawning interactive shell interpreters, a strong indicator of agent goal hijacking, prompt injection leading to code execution, or unsafe tool invocation.",
     platform: ["Linux", "OCI"],
     mitre: ["T1059.004"],
     category: "AI Security",
@@ -1287,7 +1287,7 @@ tags:
     tuningGuidance:
       "Suppress single occurrences at agent startup. Alert on repeated or mid-session invocations, or when multiple enumeration commands are run in sequence within a short time window.",
     deploymentNotes:
-      "Requires process creation telemetry. These are very common binaries so volume may be high — apply time-window aggregation to detect bursts rather than individual events.",
+      "Requires process creation telemetry. These are very common binaries so volume may be high, apply time-window aggregation to detect bursts rather than individual events.",
     evasionConsiderations:
       "Python's os.environ and os.getuid() built-ins accomplish the same enumeration without spawning child processes, making subprocess-based detection ineffective against in-process reconnaissance.",
     problemStatement:
@@ -1739,7 +1739,7 @@ tags:
     id: "asi05-oci-linux-001",
     title: "Linux Agent Executing From Temporary Or Shared Memory Paths",
     description:
-      "Detects AI agent runtimes spawning processes from temporary or shared memory paths (/tmp, /dev/shm), indicating execution of dynamically dropped payloads — a hallmark of fileless malware or prompt-injection-driven code execution.",
+      "Detects AI agent runtimes spawning processes from temporary or shared memory paths (/tmp, /dev/shm), indicating execution of dynamically dropped payloads, a hallmark of fileless malware or prompt-injection-driven code execution.",
     platform: ["Linux", "OCI"],
     mitre: ["T1059.004"],
     category: "AI Security",
@@ -1816,7 +1816,7 @@ tags:
     evasionConsiderations:
       "Attackers using memfd_create() execute directly from memory without creating a visible file path, completely bypassing path-based detection while achieving the same effect.",
     problemStatement:
-      "Execution from /tmp or /dev/shm is the defining behavior of a dropper attack. When an AI agent spawns processes from these paths it indicates the agent has been directed to download, stage, and execute an unauthorized payload — a critical security event requiring immediate investigation.",
+      "Execution from /tmp or /dev/shm is the defining behavior of a dropper attack. When an AI agent spawns processes from these paths it indicates the agent has been directed to download, stage, and execute an unauthorized payload, a critical security event requiring immediate investigation.",
   },
   {
     id: "asi05-oci-linux-002",
@@ -2241,7 +2241,7 @@ tags:
     tuningGuidance:
       "Baseline normal memory write patterns (frequency, file size, time of day) and alert on anomalous patterns such as large bulk writes or writes during unexpected time windows.",
     deploymentNotes:
-      "Requires file event auditing on agent memory directories. Path patterns vary significantly between agent frameworks — enumerate paths based on your specific deployment.",
+      "Requires file event auditing on agent memory directories. Path patterns vary significantly between agent frameworks, enumerate paths based on your specific deployment.",
     evasionConsiderations:
       "An attacker controlling the agent may use the agent's own legitimate memory write APIs to inject poisoned content, making process-based detection ineffective since it is the correct process writing the file.",
     problemStatement:
@@ -2418,7 +2418,7 @@ tags:
     evasionConsiderations:
       "Indirect prompt injection embedded in web pages fetched via browser automation will bypass file-based detection as the content is passed directly to the LLM without being written to disk.",
     problemStatement:
-      "Indirect prompt injection occurs when adversarial instructions are embedded in content that the agent processes — documents, web pages, emails. By detecting when agents read files from download directories, defenders can identify the potential injection vector for subsequent behavioral anomalies.",
+      "Indirect prompt injection occurs when adversarial instructions are embedded in content that the agent processes, documents, web pages, emails. By detecting when agents read files from download directories, defenders can identify the potential injection vector for subsequent behavioral anomalies.",
   },
   {
     id: "asi06-oci-linux-004",
@@ -2681,7 +2681,7 @@ tags:
     tuningGuidance:
       "Build an allowlist of approved localhost services and their ports per host. Alert only on connections to ports not in the allowlist for that host.",
     deploymentNotes:
-      "Requires network connection telemetry including localhost connections. Many monitoring solutions filter loopback traffic — ensure your telemetry captures it.",
+      "Requires network connection telemetry including localhost connections. Many monitoring solutions filter loopback traffic, ensure your telemetry captures it.",
     evasionConsiderations:
       "Attackers may use Unix domain sockets instead of TCP connections to communicate with local services, completely bypassing network-level detection.",
     problemStatement:
@@ -2855,7 +2855,7 @@ tags:
     evasionConsiderations:
       "Attackers may use Unix socket paths to the Docker daemon (/var/run/docker.sock) rather than TCP, bypassing network-level detection.",
     problemStatement:
-      "Connections to Docker daemon ports from an AI agent indicate a potential container escape attempt — the agent may be trying to spawn new containers, modify container configurations, or pivot to the host system through the Docker API.",
+      "Connections to Docker daemon ports from an AI agent indicate a potential container escape attempt, the agent may be trying to spawn new containers, modify container configurations, or pivot to the host system through the Docker API.",
   },
   {
     id: "asi07-oci-linux-004",
@@ -2940,7 +2940,7 @@ tags:
     tuningGuidance:
       "Allowlist known legitimate socket paths (e.g., database sockets). Alert on sockets with non-standard or randomized names that suggest dynamic creation for covert communication.",
     deploymentNotes:
-      "Requires file creation event auditing. Socket file creation may be captured differently from regular file events in some telemetry solutions — verify coverage.",
+      "Requires file creation event auditing. Socket file creation may be captured differently from regular file events in some telemetry solutions, verify coverage.",
     evasionConsiderations:
       "Agents may use abstract namespace Unix sockets (beginning with null byte) which are not visible in the filesystem and cannot be detected through file event monitoring.",
     problemStatement:
@@ -3812,7 +3812,7 @@ tags:
     tuningGuidance:
       "This detection has very low false positive potential in headless server environments. In desktop environments, alert on all executable file types placed on the Desktop by agent processes.",
     deploymentNotes:
-      "Requires file creation event auditing. Desktop paths vary by Linux distribution and desktop environment — enumerate expected paths for your deployment.",
+      "Requires file creation event auditing. Desktop paths vary by Linux distribution and desktop environment, enumerate expected paths for your deployment.",
     evasionConsiderations:
       "Attackers may create files in other user-accessible locations (Documents, Downloads, mounted network shares) rather than the Desktop to evade Desktop-specific path monitoring.",
     problemStatement:
@@ -4272,7 +4272,7 @@ tags:
     id: "asi10-oci-linux-005",
     title: "Linux Agent Attempting To Disable Security Controls",
     description:
-      "Detects AI agent processes executing commands that disable security software (Falcon sensor), clear firewall rules, or disable host-based firewalls — the highest-severity indicator of a fully rogue agent actively attempting to remove its detection surface.",
+      "Detects AI agent processes executing commands that disable security software (Falcon sensor), clear firewall rules, or disable host-based firewalls, the highest-severity indicator of a fully rogue agent actively attempting to remove its detection surface.",
     platform: ["Linux", "OCI"],
     mitre: ["T1562.001"],
     category: "AI Security",
@@ -4356,7 +4356,7 @@ tags:
       "No legitimate AI agent use case exists for disabling security sensors or firewall rules. Any occurrence should be treated as a confirmed incident.",
     ],
     tuningGuidance:
-      "Zero tolerance — all alerts should be escalated immediately to incident response. No suppression or tuning is recommended for this detection.",
+      "Zero tolerance, all alerts should be escalated immediately to incident response. No suppression or tuning is recommended for this detection.",
     deploymentNotes:
       "Requires process creation telemetry with full command-line capture. This detection should be configured with the highest alert priority and automated response actions (isolate host, revoke agent credentials).",
     evasionConsiderations:

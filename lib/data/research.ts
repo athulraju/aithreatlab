@@ -24,7 +24,7 @@ export const researchSections: ResearchSection[] = [
       },
       {
         title: "OWASP Top 10 for Large Language Model Applications (2025)",
-        description: "The definitive practitioner reference for LLM security risks — prompt injection, insecure output handling, supply chain vulnerabilities, and more.",
+        description: "The definitive practitioner reference for LLM security risks, prompt injection, insecure output handling, supply chain vulnerabilities, and more.",
         url: "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
         source: "standard",
       },
@@ -72,7 +72,7 @@ export const researchSections: ResearchSection[] = [
     links: [
       {
         title: "OWASP Top 10 for Agentic AI Applications",
-        description: "Security risks specific to autonomous AI agents — unsafe tool invocation, goal drift, multi-agent trust exploitation, and data exfiltration patterns.",
+        description: "Security risks specific to autonomous AI agents, unsafe tool invocation, goal drift, multi-agent trust exploitation, and data exfiltration patterns.",
         url: "https://owasp.org/www-project-top-10-for-large-language-model-applications/",
         source: "standard",
       },
@@ -150,19 +150,19 @@ export const researchSections: ResearchSection[] = [
       },
       {
         title: "The Pyramid of Pain",
-        description: "David Bianco's classic model illustrating the relative difficulty of denying adversaries different types of IOCs — from hash values to TTPs.",
+        description: "David Bianco's classic model illustrating the relative difficulty of denying adversaries different types of IOCs, from hash values to TTPs.",
         url: "https://detect-respond.blogspot.com/2013/03/the-pyramid-of-pain.html",
         source: "blog",
       },
       {
         title: "Detection Engineering with PySpark at Scale",
-        description: "Engineering patterns for implementing distributed behavioral detection pipelines using Apache Spark — handling class imbalance, windowing, and UDFs.",
+        description: "Engineering patterns for implementing distributed behavioral detection pipelines using Apache Spark, handling class imbalance, windowing, and UDFs.",
         url: "https://databricks.com/blog/security-analytics",
         source: "blog",
       },
       {
         title: "Evasion Attacks Against Machine Learning at Test Time",
-        description: "Foundational adversarial ML paper on evasion attacks — essential for understanding how detection ML models can be evaded.",
+        description: "Foundational adversarial ML paper on evasion attacks, essential for understanding how detection ML models can be evaded.",
         url: "https://arxiv.org/abs/1708.06131",
         source: "arXiv",
       },
@@ -216,7 +216,7 @@ export const researchSections: ResearchSection[] = [
       },
       {
         title: "Handling Class Imbalance in Security Anomaly Detection",
-        description: "Techniques for training anomaly detectors under extreme positive-class scarcity — oversampling, cost-sensitive learning, and evaluation framework.",
+        description: "Techniques for training anomaly detectors under extreme positive-class scarcity, oversampling, cost-sensitive learning, and evaluation framework.",
         url: "https://arxiv.org/abs/1901.01203",
         source: "arXiv",
       },
@@ -240,13 +240,13 @@ export const researchSections: ResearchSection[] = [
       },
       {
         title: "Backdoor Attacks on Language Models",
-        description: "Survey of training-time backdoor attacks against LLMs — poisoning datasets to create triggered behaviors that bypass safety evaluations.",
+        description: "Survey of training-time backdoor attacks against LLMs, poisoning datasets to create triggered behaviors that bypass safety evaluations.",
         url: "https://arxiv.org/abs/2211.11958",
         source: "arXiv",
       },
       {
         title: "Privacy Side Channels in Machine Learning Systems",
-        description: "How LLMs memorize and leak training data through inference-time attacks — membership inference, extraction attacks, and mitigations.",
+        description: "How LLMs memorize and leak training data through inference-time attacks, membership inference, extraction attacks, and mitigations.",
         url: "https://arxiv.org/abs/2309.05610",
         source: "arXiv",
       },
@@ -264,7 +264,7 @@ export const researchSections: ResearchSection[] = [
       },
       {
         title: "SmoothLLM: Defending Large Language Models Against Jailbreaking Attacks",
-        description: "Randomized smoothing defense against adversarial prompt attacks — the first provably robust defense for aligned LLMs.",
+        description: "Randomized smoothing defense against adversarial prompt attacks, the first provably robust defense for aligned LLMs.",
         url: "https://arxiv.org/abs/2310.03684",
         source: "arXiv",
       },

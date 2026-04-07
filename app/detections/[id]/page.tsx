@@ -34,7 +34,7 @@ export default function DetectionDetailPage({ params }: { params: { id: string }
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   useEffect(() => {
-    document.title = `${detection.title} — AIDetectLab`;
+    document.title = `${detection.title} | AIDetectLab`;
   }, [detection.title]);
 
   const logicContent = {

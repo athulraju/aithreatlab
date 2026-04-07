@@ -36,7 +36,7 @@ export default function AgentSkillsPage() {
   const [copied, setCopied]                 = useState(false);
 
   useEffect(() => {
-    document.title = "Agent Skills — AIDetectLab";
+    document.title = "Agent Skills | AIDetectLab";
     setSelectedSkill(agentSkills.find((s) => s.type === "detection") ?? null);
   }, []);
 

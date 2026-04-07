@@ -23,9 +23,9 @@ export const owaspLLMTop10: OWASPItem[] = [
       "Attackers craft inputs that manipulate the LLM to ignore its instructions and perform unintended actions. Can be direct (user input) or indirect (injected via retrieved content, tool outputs, or documents).",
     protection: [
       "Implement input validation and sanitization layers",
-      "Use privilege-separated architectures — never expose raw user input directly to LLM system prompt",
+      "Use privilege-separated architectures, never expose raw user input directly to LLM system prompt",
       "Apply content filtering to all external data sources before LLM ingestion",
-      "Enforce strict tool permission boundaries — minimize what agents can do",
+      "Enforce strict tool permission boundaries, minimize what agents can do",
     ],
     monitoring: [
       "Log all LLM inputs and outputs with user identity context",
@@ -130,7 +130,7 @@ export const owaspLLMTop10: OWASPItem[] = [
     category: "llm",
     severity: "medium",
     description:
-      "Attackers craft inputs that consume disproportionate computational resources — extremely long prompts, recursive context expansion, or adversarial inputs that cause model instability.",
+      "Attackers craft inputs that consume disproportionate computational resources, extremely long prompts, recursive context expansion, or adversarial inputs that cause model instability.",
     protection: [
       "Enforce token limits on inputs and outputs",
       "Implement rate limiting per user, IP, and API key",
@@ -148,7 +148,7 @@ export const owaspLLMTop10: OWASPItem[] = [
       "Cost allocation logs by user/team",
     ],
     detectionIdeas: [
-      "Statistical baseline on token usage — flag requests >3 sigma above mean",
+      "Statistical baseline on token usage, flag requests >3 sigma above mean",
       "Alert on token consumption spikes from new or low-reputation principals",
     ],
     challenges: [
@@ -196,10 +196,10 @@ export const owaspLLMTop10: OWASPItem[] = [
     category: "llm",
     severity: "high",
     description:
-      "LLMs may reveal sensitive data — including PII, credentials, internal system details, or confidential business context — either memorized from training data or present in the conversation context.",
+      "LLMs may reveal sensitive data, including PII, credentials, internal system details, or confidential business context, either memorized from training data or present in the conversation context.",
     protection: [
       "Apply output filtering to detect and redact PII and secrets before returning responses",
-      "Restrict what data enters the LLM context — enforce data classification at ingestion",
+      "Restrict what data enters the LLM context, enforce data classification at ingestion",
       "Use data loss prevention (DLP) controls on LLM API responses",
       "Avoid including credentials, internal URLs, or sensitive configuration in prompts",
     ],
@@ -235,7 +235,7 @@ export const owaspLLMTop10: OWASPItem[] = [
     protection: [
       "Apply least-privilege permissions to all LLM plugins and tool integrations",
       "Validate and sanitize all inputs passed to plugins before execution",
-      "Require authentication for plugin API endpoints — do not assume LLM context is trusted",
+      "Require authentication for plugin API endpoints, do not assume LLM context is trusted",
       "Document plugin capabilities and enforce strict parameter schemas",
     ],
     monitoring: [
@@ -266,7 +266,7 @@ export const owaspLLMTop10: OWASPItem[] = [
     category: "llm",
     severity: "high",
     description:
-      "LLM-based systems granted excessive permissions or autonomy can take harmful actions with real-world consequences — deleting data, sending communications, modifying configurations — without adequate human oversight.",
+      "LLM-based systems granted excessive permissions or autonomy can take harmful actions with real-world consequences, deleting data, sending communications, modifying configurations, without adequate human oversight.",
     protection: [
       "Grant LLM systems the minimum permissions required for defined tasks",
       "Implement human-in-the-loop approval for consequential or irreversible actions",
@@ -289,7 +289,7 @@ export const owaspLLMTop10: OWASPItem[] = [
       "Volume anomaly on write/send operations from LLM-attributed sessions",
     ],
     challenges: [
-      "Legitimate agentic workflows involve consequential actions — intent is hard to determine",
+      "Legitimate agentic workflows involve consequential actions, intent is hard to determine",
       "Human approval workflows can be bypassed through prompt manipulation",
       "Defining acceptable action boundaries is organization-specific",
     ],
@@ -301,7 +301,7 @@ export const owaspLLMTop10: OWASPItem[] = [
     category: "llm",
     severity: "medium",
     description:
-      "Users and systems place excessive trust in LLM outputs without verification, leading to security-relevant decisions based on hallucinated, biased, or manipulated content — including incorrect security guidance, code vulnerabilities, or false threat intelligence.",
+      "Users and systems place excessive trust in LLM outputs without verification, leading to security-relevant decisions based on hallucinated, biased, or manipulated content, including incorrect security guidance, code vulnerabilities, or false threat intelligence.",
     protection: [
       "Implement output validation for safety-critical LLM use cases",
       "Design systems to treat LLM outputs as advisory rather than authoritative",
@@ -336,7 +336,7 @@ export const owaspLLMTop10: OWASPItem[] = [
     category: "llm",
     severity: "medium",
     description:
-      "Lack of resource controls allows attackers or misconfigurations to cause excessive LLM API consumption — through long prompts, context flooding, recursive agent loops, or credential sharing — resulting in cost exhaustion, degraded availability, or denial of service.",
+      "Lack of resource controls allows attackers or misconfigurations to cause excessive LLM API consumption, through long prompts, context flooding, recursive agent loops, or credential sharing, resulting in cost exhaustion, degraded availability, or denial of service.",
     protection: [
       "Enforce per-user and per-application token limits and rate limits",
       "Implement context window management to prevent unbounded expansion",
@@ -354,7 +354,7 @@ export const owaspLLMTop10: OWASPItem[] = [
       "Agent execution trace logs with depth and duration metrics",
     ],
     detectionIdeas: [
-      "Statistical baseline on token usage — alert on requests exceeding 3 sigma above user mean",
+      "Statistical baseline on token usage, alert on requests exceeding 3 sigma above user mean",
       "Alert on agent loops exceeding configured depth or duration thresholds",
       "Detect distributed DoS: many low-volume users from correlated IPs targeting same endpoint",
     ],
@@ -376,7 +376,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
     description:
       "AI agents invoke tools with excessive permissions or insufficient validation, enabling attackers to trigger destructive actions through adversarial prompts or goal manipulation.",
     protection: [
-      "Implement least-privilege tool permissions — scope each tool to minimum required access",
+      "Implement least-privilege tool permissions, scope each tool to minimum required access",
       "Require human-in-the-loop approval for high-impact tool actions",
       "Validate tool arguments against strict schemas before execution",
       "Separate tool execution permissions from planning/reasoning context",
@@ -393,7 +393,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
       "Human approval/denial logs for high-impact actions",
     ],
     detectionIdeas: [
-      "Tool call sequence modeling — flag sequences inconsistent with stated task",
+      "Tool call sequence modeling, flag sequences inconsistent with stated task",
       "Argument anomaly detection for sensitive parameters (paths, URLs, principals)",
       "Alert on tool calls made within seconds of external data ingestion (indirect injection)",
     ],
@@ -410,16 +410,16 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "high",
     description:
-      "Autonomous agents deviate from intended objectives, pursuing sub-goals that conflict with user intent — either through manipulation, poor instruction following, or emergent optimization behavior.",
+      "Autonomous agents deviate from intended objectives, pursuing sub-goals that conflict with user intent, either through manipulation, poor instruction following, or emergent optimization behavior.",
     protection: [
       "Define explicit success criteria and stopping conditions in agent prompts",
-      "Implement task scoping — restrict agent to declared resources and actions",
+      "Implement task scoping, restrict agent to declared resources and actions",
       "Add periodic human checkpoints for long-running tasks",
-      "Use multi-agent oversight — have a monitoring agent review primary agent plans",
+      "Use multi-agent oversight, have a monitoring agent review primary agent plans",
     ],
     monitoring: [
       "Compare actual agent actions against declared task objectives",
-      "Monitor resource access scope — alert if agent accesses out-of-scope assets",
+      "Monitor resource access scope, alert if agent accesses out-of-scope assets",
       "Track agent-initiated communications (emails, API calls, messages)",
     ],
     logsRequired: [
@@ -444,10 +444,10 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "high",
     description:
-      "Agents with over-broad permissions operate in environments where they can make consequential decisions — deleting data, contacting users, deploying code — without appropriate human oversight.",
+      "Agents with over-broad permissions operate in environments where they can make consequential decisions, deleting data, contacting users, deploying code, without appropriate human oversight.",
     protection: [
       "Define agent permission boundaries before deployment",
-      "Implement reversibility checks — require confirmation for irreversible actions",
+      "Implement reversibility checks, require confirmation for irreversible actions",
       "Use staged autonomy with increasing human oversight requirements for higher-impact actions",
       "Audit agent permission grants regularly",
     ],
@@ -466,7 +466,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
       "Monitor agent service account activity for patterns inconsistent with defined role",
     ],
     challenges: [
-      "Autonomous operation is the intended design — distinguishing legitimate from excessive is context-dependent",
+      "Autonomous operation is the intended design, distinguishing legitimate from excessive is context-dependent",
     ],
   },
   {
@@ -476,7 +476,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "critical",
     description:
-      "Agents manipulated through prompt injection or goal drift are used as data exfiltration channels — reading sensitive data and transmitting it via email, API calls, or external web requests.",
+      "Agents manipulated through prompt injection or goal drift are used as data exfiltration channels, reading sensitive data and transmitting it via email, API calls, or external web requests.",
     protection: [
       "Implement DLP controls on agent egress (emails, API calls, file writes)",
       "Restrict agent access to sensitive data stores to read-only where possible",
@@ -500,7 +500,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
       "Volume anomaly on data egress from agent service account",
     ],
     challenges: [
-      "Agents legitimately read and summarize data — distinguishing exfiltration from intended use",
+      "Agents legitimately read and summarize data, distinguishing exfiltration from intended use",
       "Slow exfiltration across many sessions is hard to detect with per-session rules",
     ],
   },
@@ -513,7 +513,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
     description:
       "In multi-agent architectures, compromised or manipulated orchestrator agents pass adversarial instructions to sub-agents, which execute them trusting the orchestrator's authority.",
     protection: [
-      "Do not grant elevated trust to messages from other agents — validate all instructions",
+      "Do not grant elevated trust to messages from other agents, validate all instructions",
       "Implement agent identity verification in multi-agent communication",
       "Use cryptographic signing for inter-agent messages in sensitive pipelines",
       "Apply the same prompt injection mitigations to agent-to-agent messages",
@@ -544,12 +544,12 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "high",
     description:
-      "Persistent agent memory stores — vector databases, conversation logs, context files, and session state — are manipulated to inject adversarial instructions that persist across sessions and influence future agent behavior.",
+      "Persistent agent memory stores, vector databases, conversation logs, context files, and session state, are manipulated to inject adversarial instructions that persist across sessions and influence future agent behavior.",
     protection: [
-      "Treat memory inputs as untrusted — validate and sanitize content before storage",
+      "Treat memory inputs as untrusted, validate and sanitize content before storage",
       "Implement access controls on agent memory stores with audit logging",
       "Use integrity checksums on critical context files and prompt templates",
-      "Scope memory access to the task — prevent cross-session context bleed",
+      "Scope memory access to the task, prevent cross-session context bleed",
     ],
     monitoring: [
       "Monitor writes to agent memory directories and vector store indices",
@@ -579,15 +579,15 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "critical",
     description:
-      "Adversarial content retrieved from external sources — web pages, documents, emails, API responses — contains injected instructions that redirect the agent to execute a sequence of malicious tool calls, often resulting in data exfiltration, system modification, or lateral movement.",
+      "Adversarial content retrieved from external sources, web pages, documents, emails, API responses, contains injected instructions that redirect the agent to execute a sequence of malicious tool calls, often resulting in data exfiltration, system modification, or lateral movement.",
     protection: [
       "Apply content filtering to all external data before it enters the agent's reasoning context",
-      "Isolate retrieval from action — prevent retrieved content from directly triggering tool calls",
+      "Isolate retrieval from action, prevent retrieved content from directly triggering tool calls",
       "Implement mandatory human review before executing action sequences following external data ingestion",
       "Use semantic analysis to detect instruction-like patterns in retrieved content",
     ],
     monitoring: [
-      "Correlate retrieval events with subsequent tool call sequences — flag anomalous patterns",
+      "Correlate retrieval events with subsequent tool call sequences, flag anomalous patterns",
       "Alert on tool calls that occur immediately after external document or web retrieval",
       "Monitor for action sequences consistent with known exfiltration or lateral movement patterns",
     ],
@@ -598,11 +598,11 @@ export const owaspAgenticTop10: OWASPItem[] = [
     ],
     detectionIdeas: [
       "Time-windowed detection: external retrieval followed by sensitive tool call within 30 seconds",
-      "Sequence anomaly: retrieval → credential access → egress — flag this three-step pattern",
+      "Sequence anomaly: retrieval → credential access → egress, flag this three-step pattern",
       "Content analysis on retrieved documents for injection-pattern strings before agent ingestion",
     ],
     challenges: [
-      "Legitimate agentic workflows retrieve content and act on it — false positives are high without baseline",
+      "Legitimate agentic workflows retrieve content and act on it, false positives are high without baseline",
       "Injection instructions may be encoded or embedded in benign-looking content",
       "Fast-moving agents may complete the exfiltration chain before detection fires",
     ],
@@ -614,12 +614,12 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "high",
     description:
-      "Agentic deployments lack adequate mechanisms for humans to observe, interrupt, or override agent behavior — allowing errors, manipulation, or misalignment to compound unchecked across long-running task sequences.",
+      "Agentic deployments lack adequate mechanisms for humans to observe, interrupt, or override agent behavior, allowing errors, manipulation, or misalignment to compound unchecked across long-running task sequences.",
     protection: [
       "Define explicit human approval gates for high-impact or irreversible actions",
       "Implement interrupt and rollback capabilities for all agent-initiated changes",
       "Provide real-time visibility dashboards showing agent task progress and tool usage",
-      "Set maximum autonomy thresholds — require human confirmation after N consecutive tool calls",
+      "Set maximum autonomy thresholds, require human confirmation after N consecutive tool calls",
     ],
     monitoring: [
       "Log all agent actions with reversibility classification (reversible vs. permanent)",
@@ -639,7 +639,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
     challenges: [
       "Defining the right frequency and granularity of oversight is organization-specific",
       "Excessive oversight checkpoints degrade the operational value of agentic AI",
-      "Approval workflow fatigue leads to rubber-stamping — qualitative oversight quality is hard to measure",
+      "Approval workflow fatigue leads to rubber-stamping, qualitative oversight quality is hard to measure",
     ],
   },
   {
@@ -649,7 +649,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "medium",
     description:
-      "Agents generate and act on inaccurate, fabricated, or adversarially manipulated information — including false threat intelligence, incorrect security advisories, fabricated audit trails, or deceptive responses to oversight systems — eroding trust in agentic workflows.",
+      "Agents generate and act on inaccurate, fabricated, or adversarially manipulated information, including false threat intelligence, incorrect security advisories, fabricated audit trails, or deceptive responses to oversight systems, eroding trust in agentic workflows.",
     protection: [
       "Require grounding citations for agent outputs used in security decisions",
       "Implement output validation pipelines that cross-check agent conclusions against authoritative sources",
@@ -667,7 +667,7 @@ export const owaspAgenticTop10: OWASPItem[] = [
       "Downstream usage logs showing where agent outputs influenced decisions",
     ],
     detectionIdeas: [
-      "Cross-reference agent-stated facts with raw log evidence — flag unexplained discrepancies",
+      "Cross-reference agent-stated facts with raw log evidence, flag unexplained discrepancies",
       "Detect agents that generate conclusive outputs without corresponding evidence in tool call logs",
       "Monitor for patterns of systematic overconfidence or scope misrepresentation",
     ],
@@ -684,17 +684,17 @@ export const owaspAgenticTop10: OWASPItem[] = [
     category: "agentic",
     severity: "high",
     description:
-      "Agents deployed with insecure runtime configurations — exposed API endpoints, unencrypted inter-agent channels, hardcoded credentials, overly permissive container privileges, or inadequate network segmentation — create infrastructure-level attack surfaces that compound agentic AI risks.",
+      "Agents deployed with insecure runtime configurations, exposed API endpoints, unencrypted inter-agent channels, hardcoded credentials, overly permissive container privileges, or inadequate network segmentation, create infrastructure-level attack surfaces that compound agentic AI risks.",
     protection: [
-      "Harden agent runtime containers — no privileged mode, minimal OS capabilities, read-only filesystem where possible",
+      "Harden agent runtime containers, no privileged mode, minimal OS capabilities, read-only filesystem where possible",
       "Encrypt all inter-agent communications in transit using mutual TLS",
       "Store agent credentials and API keys in secrets management systems, not environment variables or config files",
-      "Apply network segmentation to agent runtimes — restrict inbound and outbound communication",
+      "Apply network segmentation to agent runtimes, restrict inbound and outbound communication",
     ],
     monitoring: [
       "Monitor agent runtime processes for container escape indicators (unexpected system calls, namespace access)",
       "Alert on hardcoded credentials detected in agent configuration files or environment variables",
-      "Track network connections from agent runtimes — flag connections to unexpected destinations",
+      "Track network connections from agent runtimes, flag connections to unexpected destinations",
     ],
     logsRequired: [
       "Container runtime security logs (syscall audit, capability usage)",

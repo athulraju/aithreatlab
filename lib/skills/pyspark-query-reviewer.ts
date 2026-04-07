@@ -61,13 +61,13 @@ export const expectedOutput = `{
     {
       "dimension": "performance",
       "severity": "high",
-      "finding": "Filter on event_type applied after join — should be pushed before join to reduce shuffle size",
+      "finding": "Filter on event_type applied after join; should be pushed before join to reduce shuffle size",
       "fix": "Move .filter(col('event_type') == 'process_create') before the join"
     },
     {
       "dimension": "performance",
       "severity": "medium",
-      "finding": "All columns selected (*) before aggregation — unnecessary data movement",
+      "finding": "All columns selected (*) before aggregation; unnecessary data movement",
       "fix": "Select only required columns (image, parent_image, user, timestamp) before groupBy"
     },
     {

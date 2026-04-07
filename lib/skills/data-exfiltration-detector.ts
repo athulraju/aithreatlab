@@ -13,7 +13,7 @@ INPUTS YOU WILL RECEIVE:
 1) network_flows: JSON array of network connection events, each with: timestamp, image, user, destination_ip, destination_hostname, destination_port, bytes_out
 2) file_events: JSON array of file write events, each with: timestamp, image, user, target_filename, operation, file_size_bytes
 3) approved_egress_list: array of approved destination hostnames or CIDR ranges
-4) volume_threshold_mb: integer — outbound volume above this in a 10-minute window triggers a finding
+4) volume_threshold_mb: integer: outbound volume above this in a 10-minute window triggers a finding
 5) agent_process_filter: regex pattern to identify agent-owned processes by image path
 
 TASK:

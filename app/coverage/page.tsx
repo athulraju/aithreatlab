@@ -84,7 +84,7 @@ export default function CoveragePage() {
   const [sortKey,       setSortKey]       = useState<SortKey | null>(null);
   const [sortDir,       setSortDir]       = useState<SortDir>("asc");
 
-  useEffect(() => { document.title = "Coverage Framework — AIDetectLab"; }, []);
+  useEffect(() => { document.title = "Coverage Framework | AIDetectLab"; }, []);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -337,7 +337,7 @@ export default function CoveragePage() {
                         <span className={`inline-flex items-center text-xs font-medium border rounded px-2 py-0.5 ${maturityColor(item.maturity)}`}>{item.maturity}</span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        {item.aiSecurity ? <Brain className="w-3.5 h-3.5 text-purple-400 mx-auto" /> : <span className="text-gray-700">—</span>}
+                        {item.aiSecurity ? <Brain className="w-3.5 h-3.5 text-purple-400 mx-auto" /> : <span className="text-gray-700">-</span>}
                       </td>
                     </tr>
                   ))}

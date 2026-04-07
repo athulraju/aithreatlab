@@ -12,7 +12,7 @@ export const prompt = `You are a detection library consistency auditor.
 INPUTS YOU WILL RECEIVE:
 1) detection_library: JSON array of detection objects, each with: id, title, severity, maturity, mitre, platform, tags, logsource_category, sigma (string)
 2) schema_version: string identifying the expected schema (e.g., "v2.1")
-3) strict_mode: boolean — if true, warnings are treated as errors
+3) strict_mode: boolean: if true, warnings are treated as errors
 4) severity_policy: JSON object mapping logsource_category → minimum expected severity (e.g., { "process_creation": "medium" })
 
 TASK:
@@ -50,7 +50,7 @@ AUDIT RULES:
 - issue severity must be error (breaks schema/logic) or warning (degrades quality).
 - If strict_mode is true, return all warnings as errors.
 - library_health_score = 100 - (errors * 5) - (warnings * 2), clamped to [0, 100].
-- Do not flag stylistic choices — only structural and semantic violations.`;
+- Do not flag stylistic choices, only structural and semantic violations.`;
 
 export const expectedOutput = `{
   "library_health_score": 81,
@@ -59,7 +59,7 @@ export const expectedOutput = `{
       "rule_id": "asi08-oci-linux-004",
       "issue_type": "missing_required_field",
       "severity": "warning",
-      "detail": "mitre field is empty array — no technique mapping provided",
+      "detail": "mitre field is empty array, no technique mapping provided",
       "suggested_fix": "Map to T1499 (Endpoint Denial of Service) based on logsource_category and rule behavior"
     },
     {
@@ -73,7 +73,7 @@ export const expectedOutput = `{
       "rule_id": "asi08-oci-linux-001",
       "issue_type": "duplicate_logic",
       "severity": "error",
-      "detail": "Condition logic 91% similar to asi08-oci-linux-002 — both select parent_image python/node with no differentiating conditions",
+      "detail": "Condition logic 91% similar to asi08-oci-linux-002; both select parent_image python/node with no differentiating conditions",
       "suggested_fix": "Merge into a single rule with logsource_category as the differentiator, or add distinguishing conditions"
     }
   ],
@@ -84,7 +84,7 @@ export const expectedOutput = `{
     "total_issues": 7
   },
   "assumptions": [
-    "Schema version v2.1 used — requires mitre as non-empty array",
-    "strict_mode=false — warnings retained as warnings"
+    "Schema version v2.1 used; requires mitre as non-empty array",
+    "strict_mode=false; warnings retained as warnings"
   ]
 }`;

@@ -11,9 +11,9 @@ export const prompt = `You are a multi-format security detection rule generator.
 
 INPUTS YOU WILL RECEIVE:
 1) threat_description: plain-text description of the threat behavior to detect
-2) sample_log: optional JSON object — a single representative log event (may be null)
+2) sample_log: optional JSON object: a single representative log event (may be null)
 3) target_platform: one or more of [windows, linux, aws, oci, network]
-4) mitre_technique_id: optional string (e.g., "T1059.004") — may be null
+4) mitre_technique_id: optional string (e.g., "T1059.004"), may be null
 5) desired_formats: array containing one or more of [sigma, splunk, pyspark]
 
 TASK:
@@ -40,12 +40,12 @@ OUTPUT REQUIREMENTS:
   - rules: object with keys matching desired_formats, each containing the rule as a string
   - metadata: { severity, mitre, required_fields, logsource_category }
   - false_positives: list of 2-4 realistic FP scenarios
-  - tuning_guidance: string — how to reduce FP rate in production
+  - tuning_guidance: string: how to reduce FP rate in production
   - quality_scores: { coverage_quality, field_specificity, format_correctness } each 0-10
   - assumptions: list any missing information that influenced rule generation
 
 GENERATION RULES:
-- Never use wildcard-only conditions (e.g., CommandLine: '*') — require at least one specific term.
+- Never use wildcard-only conditions (e.g., CommandLine: '*'); require at least one specific term.
 - Always include at least one filter condition for known-good sources.
 - If mitre_technique_id is provided, include it in Sigma tags.
 - If sample_log is null, derive field names from common schema for the target_platform.
@@ -75,7 +75,7 @@ export const expectedOutput = `{
     "format_correctness": 9
   },
   "assumptions": [
-    "Target platform linux — used auditd field schema",
-    "sample_log was null — field names derived from standard Linux process_creation schema"
+    "Target platform linux; used auditd field schema",
+    "sample_log was null; field names derived from standard Linux process_creation schema"
   ]
 }`;

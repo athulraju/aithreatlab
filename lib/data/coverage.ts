@@ -68,7 +68,7 @@ export const coverageData: CoverageItem[] = [
     coverageType: "rule-based",
     maturity: "stable",
     aiSecurity: false,
-    notes: "High FP potential — requires tuning",
+    notes: "High FP potential, requires tuning",
   },
   {
     id: "cov-004",
@@ -82,7 +82,7 @@ export const coverageData: CoverageItem[] = [
     coverageType: "rule-based",
     maturity: "production",
     aiSecurity: false,
-    notes: "Critical coverage — low tolerance for gaps",
+    notes: "Critical coverage, low tolerance for gaps",
     detectionId: "det-002",
   },
   // Host Application
@@ -317,6 +317,6 @@ export const coverageData: CoverageItem[] = [
     coverageType: "planned",
     maturity: "planned",
     aiSecurity: true,
-    notes: "DLP integration required — in development",
+    notes: "DLP integration required, in development",
   },
 ];

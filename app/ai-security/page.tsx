@@ -196,7 +196,7 @@ export default function AISecurityPage() {
   const [activeCatFilter, setActiveCatFilter] = useState<string | null>(null);
   const spotlight = getCurrentSpotlight();
 
-  useEffect(() => { document.title = "AI Security — AIDetectLab"; }, []);
+  useEffect(() => { document.title = "AI Security | AIDetectLab"; }, []);
 
   const baseList   = activeTab === "llm" ? owaspLLMTop10 : owaspAgenticTop10;
   const activeList = activeCatFilter
@@ -234,7 +234,7 @@ export default function AISecurityPage() {
         <PageHeader
           eyebrow="AI Security"
           title="AI & LLM Threat Detection"
-          description="OWASP Top 10 for LLMs and Agentic AI — with detection guidance, monitoring requirements, and practical threat models."
+          description="OWASP Top 10 for LLMs and Agentic AI, with detection guidance, monitoring requirements, and practical threat models."
           accent="purple"
         />
 
@@ -354,7 +354,7 @@ export default function AISecurityPage() {
           >
             <span className="text-xs text-gray-500">
               Filtering by <span className="text-purple-300 font-medium">{aiCategories.find(c => c.id === activeCatFilter)?.name}</span>
-              {" "}— {activeList.length} {activeList.length === 1 ? "result" : "results"}
+              {" "}({activeList.length} {activeList.length === 1 ? "result" : "results"})
             </span>
             <button
               onClick={() => { setActiveCatFilter(null); setExpandedIds(new Set()); }}

@@ -13,7 +13,7 @@ INPUTS YOU WILL RECEIVE:
 1) tool_call_log: JSON array of tool invocations, each with: timestamp, tool_name, arguments, target_resource, agent_id
 2) authorized_tool_manifest: JSON object mapping tool_name → { allowed_verbs, allowed_resource_patterns, rate_limit_per_minute }
 3) resource_scope_policy: plain-text description of what resources the agent is permitted to access
-4) time_window_minutes: integer — the window to evaluate
+4) time_window_minutes: integer: the window to evaluate
 
 TASK:
 Identify tool calls that violate the authorized manifest or scope policy. Detect destructive verb usage,
@@ -47,7 +47,7 @@ OUTPUT REQUIREMENTS:
 
 ANALYSIS RULES:
 - If a tool is not in the manifest, treat all its calls as unauthorized.
-- Do not penalize tools for argument patterns not covered by the manifest — flag as assumption.
+- Do not penalize tools for argument patterns not covered by the manifest; flag as assumption.
 - recommended_response must be one of: [monitor, alert, revoke_agent_token, isolate_host].`;
 
 export const expectedOutput = `{
@@ -77,6 +77,6 @@ export const expectedOutput = `{
   },
   "assumptions": [
     "prod-backups bucket assumed to be a production resource based on naming convention",
-    "rate_limit_per_minute not provided for oci_cli — rate analysis skipped"
+    "rate_limit_per_minute not provided for oci_cli; rate analysis skipped"
   ]
 }`;

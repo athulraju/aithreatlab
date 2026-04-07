@@ -159,7 +159,7 @@ export function splunkToPySpark(splunk: string): ConversionResult {
       const headMatch = cmd.match(/^head\s+(\d+)$/i);
       if (headMatch) { limitClause = `LIMIT ${headMatch[1]}`; continue; }
       const tailMatch = cmd.match(/^tail\s+(\d+)$/i);
-      if (tailMatch) { warnings.push("SPL 'tail' has no direct SQL equivalent — approximated with ORDER BY + LIMIT."); continue; }
+      if (tailMatch) { warnings.push("SPL 'tail' has no direct SQL equivalent; approximated with ORDER BY + LIMIT."); continue; }
 
       // | table field1, field2
       const tableMatch = cmd.match(/^table\s+(.+)$/i);
@@ -172,24 +172,24 @@ export function splunkToPySpark(splunk: string): ConversionResult {
       // | dedup field
       const dedupMatch = cmd.match(/^dedup\s+(\w+)$/i);
       if (dedupMatch) {
-        warnings.push(`SPL 'dedup ${dedupMatch[1]}' approximated — use ROW_NUMBER() OVER (PARTITION BY ${dedupMatch[1]}) in a subquery for exact deduplication.`);
+        warnings.push(`SPL 'dedup ${dedupMatch[1]}' approximated; use ROW_NUMBER() OVER (PARTITION BY ${dedupMatch[1]}) in a subquery for exact deduplication.`);
         continue;
       }
 
       // | eval field=expr
       const evalMatch = cmd.match(/^eval\s+(\w+)=(.+)$/i);
       if (evalMatch) {
-        warnings.push(`SPL eval '${evalMatch[1]}=${evalMatch[2]}' — add this as a computed column in the SELECT clause manually.`);
+        warnings.push(`SPL eval '${evalMatch[1]}=${evalMatch[2]}'; add this as a computed column in the SELECT clause manually.`);
         continue;
       }
 
       // | rex field=_raw "(?<named>\w+)"
       if (cmd.match(/^rex\b/i)) {
-        warnings.push("SPL rex (regex extraction) — use regexp_extract() in Spark SQL or pyspark.sql.functions.regexp_extract().");
+        warnings.push("SPL rex (regex extraction); use regexp_extract() in Spark SQL or pyspark.sql.functions.regexp_extract().");
         continue;
       }
 
-      warnings.push(`Unsupported SPL command: '${cmd.split(" ")[0]}' — review manually.`);
+      warnings.push(`Unsupported SPL command: '${cmd.split(" ")[0]}', review manually.`);
     }
 
     // ── Assemble Spark SQL query ─────────────────────────────────────────────
@@ -219,26 +219,26 @@ from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.appName("detection").getOrCreate()
 
-# Option A — Spark SQL
+# Option A: Spark SQL
 df_result = spark.sql("""
     ${sql}
 """)
 
 df_result.show(50, truncate=False)
 
-# Option B — DataFrame API
+# Option B: DataFrame API
 # df = spark.table("${tableName}")
 # df_filtered = df${whereConditions.length > 0 ? `.filter(...)  # Apply conditions from WHERE clause above` : ""}
 # df_result = df_filtered${statsClause ? `.groupBy(...).agg(...)  # Apply aggregation from SELECT clause above` : ""}
 `;
 
     if (notes.length === 0) notes.push("Basic conversion completed. Review field names against your Spark schema.");
-    warnings.push("Verify column names match your Spark table schema — SPL field names may differ.");
+    warnings.push("Verify column names match your Spark table schema; SPL field names may differ.");
 
     return { output, notes, warnings, valid: true };
   } catch (e) {
     return {
-      output: "# Conversion failed — please check the input SPL query.\n",
+      output: "# Conversion failed. Please check the input SPL query.\n",
       notes: [],
       warnings: ["Unexpected error during conversion."],
       valid: false,

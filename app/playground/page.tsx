@@ -229,24 +229,24 @@ function simulate(scenario: Scenario, query: string): SimResult {
     "agent-misuse": {
       match: true,
       confidence: "Critical",
-      explanation: "AI agent (agent-0x4f2) accessed /etc/passwd and ~/.aws/credentials — both outside declared task scope. Followed by email to external address within 50 seconds of first anomaly.",
+      explanation: "AI agent (agent-0x4f2) accessed /etc/passwd and ~/.aws/credentials, both outside declared task scope. Followed by email to external address within 50 seconds of first anomaly.",
       events: 3,
     },
     "cloud-audit": {
       match: true,
       confidence: "High",
-      explanation: "IAM escalation chain: ListRoles → AttachRolePolicy(AdministratorAccess) → AssumeRole — all within 15 minutes by dev-user. New access pattern from IP 34.218.0.0.",
+      explanation: "IAM escalation chain: ListRoles → AttachRolePolicy(AdministratorAccess) → AssumeRole, all within 15 minutes by dev-user. New access pattern from IP 34.218.0.0.",
       events: 3,
     },
     "endpoint-execution": {
       match: true,
       confidence: "Critical",
-      explanation: "LOLBin execution chain confirmed: cmd → mshta(javascript) → powershell(encoded) → certutil(urlcache). Process tree spans 3 generations. Certutil downloading from http://evil.com — matches known malware IOC.",
+      explanation: "LOLBin execution chain confirmed: cmd → mshta(javascript) → powershell(encoded) → certutil(urlcache). Process tree spans 3 generations. Certutil downloading from http://evil.com, matches known malware IOC.",
       events: 3,
     },
   };
 
-  return hasQuery ? results[scenario] : { match: false, confidence: "—", explanation: "No query loaded. Enter a detection query and click Run.", events: 0 };
+  return hasQuery ? results[scenario] : { match: false, confidence: "N/A", explanation: "No query loaded. Enter a detection query and click Run.", events: 0 };
 }
 
 function generateDummyData(scenario: Scenario): string {
@@ -474,7 +474,7 @@ export default function PlaygroundPage() {
   const [result, setResult] = useState<SimResult | null>(null);
   const [running, setRunning] = useState(false);
 
-  useEffect(() => { document.title = "Playground — AIDetectLab"; }, []);
+  useEffect(() => { document.title = "Playground | AIDetectLab"; }, []);
 
   // Quality scorer
   const [qualityRule, setQualityRule] = useState(QUALITY_PLACEHOLDER);
@@ -799,7 +799,7 @@ export default function PlaygroundPage() {
                   <div>
                     <Star className="w-8 h-8 text-gray-700 mx-auto mb-3" />
                     <p className="text-sm text-gray-600">Paste a rule and click Evaluate</p>
-                    <p className="text-xs text-gray-700 mt-1">Score is computed locally — no backend needed</p>
+                    <p className="text-xs text-gray-700 mt-1">Score is computed locally, no backend needed</p>
                   </div>
                 </div>
               )}

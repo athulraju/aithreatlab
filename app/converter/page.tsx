@@ -109,7 +109,7 @@ export default function ConverterPage() {
   const [copied,       setCopied]       = useState(false);
   const [converting,   setConverting]   = useState(false);
 
-  useEffect(() => { document.title = "Converter — AIDetectLab"; }, []);
+  useEffect(() => { document.title = "Converter | AIDetectLab"; }, []);
 
   const handleConvert = useCallback(async () => {
     setConverting(true);
@@ -405,9 +405,9 @@ export default function ConverterPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { title: "Sigma Rule Writing Guide",    description: "Official Sigma HQ documentation — rule syntax, field modifiers, logsource definitions, and condition logic.", label: "Sigma HQ",          href: "https://sigmahq.io/docs/guide/getting-started.html", accent: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",     dot: "bg-cyan-400" },
-              { title: "Splunk SPL Reference",         description: "Splunk Search Processing Language reference — commands, functions, eval expressions, and search optimization.", label: "Splunk Docs",        href: "https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/WhatsInThisManual", accent: "text-orange-400 bg-orange-400/10 border-orange-400/20", dot: "bg-orange-400" },
-              { title: "PySpark SQL Functions",        description: "Apache Spark Python API reference — DataFrame operations, SQL functions, window functions, and streaming.", label: "Apache Spark Docs",  href: "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/functions.html", accent: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20", dot: "bg-yellow-400" },
+              { title: "Sigma Rule Writing Guide",    description: "Official Sigma HQ documentation: rule syntax, field modifiers, logsource definitions, and condition logic.", label: "Sigma HQ",          href: "https://sigmahq.io/docs/guide/getting-started.html", accent: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",     dot: "bg-cyan-400" },
+              { title: "Splunk SPL Reference",         description: "Splunk Search Processing Language reference: commands, functions, eval expressions, and search optimization.", label: "Splunk Docs",        href: "https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/WhatsInThisManual", accent: "text-orange-400 bg-orange-400/10 border-orange-400/20", dot: "bg-orange-400" },
+              { title: "PySpark SQL Functions",        description: "Apache Spark Python API reference: DataFrame operations, SQL functions, window functions, and streaming.", label: "Apache Spark Docs",  href: "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/functions.html", accent: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20", dot: "bg-yellow-400" },
             ].map((resource, i) => (
               <motion.a
                 key={resource.title}

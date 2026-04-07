@@ -4,7 +4,7 @@ export const ociDetections: Detection[] = [
   // OCI Detections
   {
     id: "det-oci-001",
-    title: "OCI Object Storage Mass Download — Data Exfiltration",
+    title: "OCI Object Storage Mass Download, Data Exfiltration",
     description:
       "Detects bulk GetObject requests against OCI Object Storage buckets, indicating potential data exfiltration via the OCI API or console.",
     platform: ["OCI", "Cloud"],
@@ -199,7 +199,7 @@ level: critical`,
   },
   {
     id: "det-oci-003",
-    title: "OCI API Key Created for Existing User — Credential Persistence",
+    title: "OCI API Key Created for Existing User, Credential Persistence",
     description:
       "Detects creation of new API keys for existing IAM users, a common persistence mechanism after initial compromise.",
     platform: ["OCI", "Cloud"],
@@ -288,7 +288,7 @@ level: high`,
     tags: ["oci", "login-anomaly", "geo", "tor", "cloud", "initial-access"],
     author: "Detection Engineering Team",
     updated: "2024-12-10",
-    sigma: `title: OCI Console Login Anomaly — New Country or Tor
+    sigma: `title: OCI Console Login Anomaly, New Country or Tor
 id: det-oci-004
 status: stable
 description: Detects console logins from anomalous geographic locations or Tor

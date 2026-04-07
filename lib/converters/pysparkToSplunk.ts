@@ -99,7 +99,7 @@ export function pysparkToSplunk(pyspark: string): ConversionResult {
 
         // Fallback — append as-is with a warning
         splSearchTerms.push(`(* ${cond} *)`);
-        warnings.push(`Could not convert condition '${cond.slice(0, 60)}' — review manually.`);
+        warnings.push(`Could not convert condition '${cond.slice(0, 60)}', review manually.`);
       }
     }
 
@@ -139,7 +139,7 @@ export function pysparkToSplunk(pyspark: string): ConversionResult {
         .replace(/COUNT\(\*\)/gi, "count");
       havingCmd = `| where ${having}`;
       notes.push("Converted HAVING clause to SPL where command.");
-      warnings.push("HAVING conditions reference aggregated fields — verify field names match SPL stats output.");
+      warnings.push("HAVING conditions reference aggregated fields; verify field names match SPL stats output.");
     }
 
     // ── Assemble SPL query ────────────────────────────────────────────────────
@@ -161,13 +161,13 @@ ${notes.map((n) => "  • " + n).join("\n")}
 ${warnings.length > 0 ? "\nWarnings:\n" + warnings.map((w) => "  ⚠ " + w).join("\n") : ""}
 \`\`\``;
 
-    if (notes.length === 0) notes.push("Basic conversion completed — review field names against your Splunk schema.");
-    warnings.push("Splunk field names may differ from Spark column names — verify against your actual index schema.");
+    if (notes.length === 0) notes.push("Basic conversion completed. Review field names against your Splunk schema.");
+    warnings.push("Splunk field names may differ from Spark column names; verify against your actual index schema.");
 
     return { output, notes, warnings, valid: true };
   } catch (e) {
     return {
-      output: "* Conversion failed — please check the input PySpark/Spark SQL code.",
+      output: "* Conversion failed. Please check the input PySpark/Spark SQL code.",
       notes: [],
       warnings: ["Unexpected error during conversion."],
       valid: false,

@@ -169,7 +169,7 @@ level: critical`,
   },
   {
     id: "det-003",
-    title: "AWS CloudTrail — Suspicious IAM Policy Attachment",
+    title: "AWS CloudTrail, Suspicious IAM Policy Attachment",
     description:
       "Detects when overly permissive IAM policies (AdministratorAccess, FullAccess) are attached to roles or users.",
     platform: ["AWS", "Cloud"],

@@ -86,7 +86,7 @@ function getSourceMapping(product: string, category: string, service: string): S
   return {
     indexClause: "index=*",
     tableFields: ["_time", "host", "source", "sourcetype", "_raw"],
-    notes: ["Could not determine logsource — using wildcard index. Narrow down for production use."],
+    notes: ["Could not determine logsource; using wildcard index. Narrow down for production use."],
   };
 }
 

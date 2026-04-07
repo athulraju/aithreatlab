@@ -19,7 +19,7 @@ export default function DetectionsPage() {
   const [selectedPlatform, setSelectedPlatform] = useState("All");
   const [selectedMaturity, setSelectedMaturity] = useState("All");
 
-  useEffect(() => { document.title = "Detection Library — AIDetectLab"; }, []);
+  useEffect(() => { document.title = "Detection Library | AIDetectLab"; }, []);
 
   const filtered = useMemo(() => {
     return detections.filter((d) => {

@@ -36,7 +36,7 @@ export function splunkToSigma(splunk: string): ConversionResult {
       notes.push("Detected AWS CloudTrail log source.");
     } else {
       logsource = `logsource:\n  category: application\n  product: generic`;
-      warnings.push("Could not definitively determine log source — review logsource section.");
+      warnings.push("Could not definitively determine log source; review logsource section.");
     }
 
     // Extract field conditions from WHERE-like clauses
@@ -71,7 +71,7 @@ level: medium
 # ${splunk.split("\n")[0].substring(0, 100)}`;
 
     notes.push("Converted from Splunk SPL to Sigma format.");
-    notes.push("Review field mappings — Splunk fields may differ from Sigma field names.");
+    notes.push("Review field mappings; Splunk fields may differ from Sigma field names.");
     notes.push("Add appropriate MITRE ATT&CK tags before production use.");
     warnings.push("Splunk macros, lookups, and complex functions cannot be automatically converted.");
     warnings.push("Validate converted rule against sample events before deployment.");

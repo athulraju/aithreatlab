@@ -82,7 +82,7 @@ const features = [
   { icon: Zap,      title: "Multi-Format Converter",  description: "Translate detections between Sigma, Splunk SPL, and PySpark with validated output and translation notes.", href: "/converter",  accent: "cyan" },
   { icon: BookOpen, title: "Detection Library",        description: "Searchable, filterable library of production-grade detections with full logic, tuning guidance, and deployment notes.", href: "/detections", accent: "blue" },
   { icon: BarChart3,title: "Coverage Framework",       description: "Structured visibility across Host OS, Network, Identity, Cloud, and AI Security layers with MITRE mapping.", href: "/coverage",   accent: "purple" },
-  { icon: Brain,    title: "AI Security",              description: "OWASP Top 10 for LLMs and Agentic AI — with practical detections, monitoring guidance, and threat models.", href: "/ai-security",accent: "purple" },
+  { icon: Brain,    title: "AI Security",              description: "OWASP Top 10 for LLMs and Agentic AI, with practical detections, monitoring guidance, and threat models.", href: "/ai-security",accent: "purple" },
   { icon: Terminal, title: "Detection Playground",     description: "Interactive workbench to write, test, and validate detections against simulated event scenarios.", href: "/playground",  accent: "cyan" },
   { icon: BookOpen, title: "Research Hub",             description: "Technical articles on detection engineering, PySpark detections, Sigma portability, and AI threat modeling.", href: "/research",   accent: "blue" },
 ];
@@ -160,7 +160,7 @@ export default function HomePage() {
             transition={{ duration: 0.5, ease, delay: 0.16 }}
             className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10"
           >
-            A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark — with a dedicated AI Security layer.
+            A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark, with a dedicated AI Security layer.
           </motion.p>
 
           <motion.div
@@ -264,7 +264,7 @@ export default function HomePage() {
         >
           <p className="text-xs font-semibold text-cyan-400 uppercase tracking-widest mb-3">Platform</p>
           <h2 className="text-3xl font-bold text-white mb-4">Everything for detection engineering</h2>
-          <p className="text-gray-400 max-w-xl mx-auto">From writing rules to validating coverage to detecting AI threats — one platform for the full detection lifecycle.</p>
+          <p className="text-gray-400 max-w-xl mx-auto">From writing rules to validating coverage to detecting AI threats. One platform for the full detection lifecycle.</p>
         </motion.div>
 
         <motion.div
@@ -313,7 +313,7 @@ export default function HomePage() {
             <p className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-3">Coverage Framework</p>
             <h2 className="text-3xl font-bold text-white mb-4">Know your detection coverage</h2>
             <p className="text-gray-400 leading-relaxed mb-6">
-              Structured visibility across 8 detection layers — from Host OS to AI Security. Map detections to MITRE techniques, identify gaps, and track maturity.
+              Structured visibility across 8 detection layers, from Host OS to AI Security. Map detections to MITRE techniques, identify gaps, and track maturity.
             </p>
             <motion.div
               className="space-y-3 mb-8"
@@ -374,7 +374,7 @@ export default function HomePage() {
         >
           <p className="text-xs font-semibold text-purple-400 uppercase tracking-widest mb-3">AI Security</p>
           <h2 className="text-3xl font-bold text-white mb-4">Detect threats in AI systems</h2>
-          <p className="text-gray-400 max-w-xl mx-auto">OWASP Top 10 for LLMs and Agentic AI — with practical monitoring guidance, detection rules, and threat models.</p>
+          <p className="text-gray-400 max-w-xl mx-auto">OWASP Top 10 for LLMs and Agentic AI, with practical monitoring guidance, detection rules, and threat models.</p>
         </motion.div>
 
         <motion.div

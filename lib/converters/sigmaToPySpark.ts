@@ -80,7 +80,7 @@ result.write \\
     notes.push(`Converted from Sigma rule: "${title}"`);
     notes.push("Adjust table name and column names to match your security lake schema.");
     notes.push("Add a time-range filter (e.g., WHERE dt = '2025-01-01') for partition pruning.");
-    warnings.push("Field names follow common security lake conventions — verify against your schema.");
+    warnings.push("Field names follow common security lake conventions; verify against your schema.");
 
     return { output, notes, warnings, valid: true };
   } catch (e) {

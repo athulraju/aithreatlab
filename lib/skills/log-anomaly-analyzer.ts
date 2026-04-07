@@ -39,7 +39,7 @@ OUTPUT REQUIREMENTS:
   - assumptions: list any missing baseline fields or ambiguities
 
 ANALYSIS RULES:
-- Do not flag events solely because they are unfamiliar to you — use only the provided baseline.
+- Do not flag events solely because they are unfamiliar to you; use only the provided baseline.
 - If sensitivity is low, only return anomaly_score >= 8. Medium >= 6. High >= 4.
 - Limit findings to the top 10 by score.
 - If no anomalies are found, return an empty findings array with a clear summary.`;
@@ -54,7 +54,7 @@ export const expectedOutput = `{
         "behavioral_deviation": 9,
         "structural_anomaly": 7
       },
-      "reason": "certutil.exe spawned by python3 — zero frequency in 30-day baseline. Parent-child pair never observed. CommandLine contains external URL pattern.",
+      "reason": "certutil.exe spawned by python3; zero frequency in 30-day baseline. Parent-child pair never observed. CommandLine contains external URL pattern.",
       "suggested_rule_title": "Python Agent Spawning CertUtil With URL Download"
     },
     {
