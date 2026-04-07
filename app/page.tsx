@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { detections } from "@/lib/data/detections";
+import { coverageData, coverageLayers } from "@/lib/data/coverage";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -18,6 +20,25 @@ import {
   AlertTriangle,
   Activity,
 } from "lucide-react";
+
+const layerColors: Record<string, string> = {
+  "Host OS": "bg-cyan-500",
+  "Host Application": "bg-blue-500",
+  "Host Network": "bg-indigo-500",
+  "Middle Network": "bg-purple-500",
+  "Large Application": "bg-violet-500",
+  "Identity": "bg-fuchsia-500",
+  "Perimeter": "bg-pink-500",
+  "AI Security Extension": "bg-rose-500",
+};
+
+const coverageLayerPreview = coverageLayers.map((layer) => ({
+  layer,
+  count: coverageData.filter((i) => i.layer === layer).length,
+  color: layerColors[layer] ?? "bg-gray-500",
+}));
+
+const coverageLayerMax = Math.max(1, ...coverageLayerPreview.map((l) => l.count));
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -80,8 +101,8 @@ const features = [
 ];
 
 const stats = [
-  { value: "20+", label: "Detection Rules" },
-  { value: "8", label: "Coverage Layers" },
+  { value: `${detections.length}`, label: "Detection Rules" },
+  { value: `${coverageLayers.length}`, label: "Coverage Layers" },
   { value: "4", label: "Output Formats" },
   { value: "OWASP", label: "LLM & Agentic Top 10" },
 ];
@@ -309,22 +330,13 @@ export default function HomePage() {
 
           <div className="card-surface p-6">
             <div className="space-y-2">
-              {[
-                { layer: "Host OS", count: 4, color: "bg-cyan-500" },
-                { layer: "Host Application", count: 2, color: "bg-blue-500" },
-                { layer: "Host Network", count: 2, color: "bg-indigo-500" },
-                { layer: "Middle Network", count: 2, color: "bg-purple-500" },
-                { layer: "Large Application", count: 2, color: "bg-violet-500" },
-                { layer: "Identity", count: 3, color: "bg-fuchsia-500" },
-                { layer: "Perimeter", count: 2, color: "bg-pink-500" },
-                { layer: "AI Security Extension", count: 3, color: "bg-rose-500" },
-              ].map((item) => (
+              {coverageLayerPreview.map((item) => (
                 <div key={item.layer} className="flex items-center gap-3">
                   <span className="text-xs text-gray-500 w-36 flex-shrink-0">{item.layer}</span>
                   <div className="flex-1 bg-white/5 rounded-full h-2 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${item.color} opacity-70`}
-                      style={{ width: `${(item.count / 5) * 100}%` }}
+                      style={{ width: `${(item.count / coverageLayerMax) * 100}%` }}
                     />
                   </div>
                   <span className="text-xs text-gray-600 w-4">{item.count}</span>

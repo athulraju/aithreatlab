@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/PageHeader";
 import { Play, RefreshCw, Terminal, FileText, CheckCircle2, AlertTriangle, ChevronDown, Shuffle, Star, TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -8,6 +8,14 @@ import { Play, RefreshCw, Terminal, FileText, CheckCircle2, AlertTriangle, Chevr
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 type Scenario = "exfiltration" | "login-anomaly" | "agent-misuse" | "cloud-audit" | "endpoint-execution";
+
+const scenarioLanguage: Record<Scenario, string> = {
+  exfiltration:       "python",
+  "login-anomaly":    "yaml",
+  "agent-misuse":     "javascript",
+  "cloud-audit":      "plaintext",
+  "endpoint-execution": "yaml",
+};
 
 const scenarios: { id: Scenario; label: string; description: string }[] = [
   { id: "exfiltration", label: "Data Exfiltration", description: "Large volume data transfer to external IP" },
@@ -237,88 +245,187 @@ function generateDummyData(scenario: Scenario): string {
 
 interface QualityScore {
   total: number;
+  format: string;
   breakdown: { label: string; score: number; max: number; feedback: string }[];
   strengths: string[];
   improvements: string[];
 }
 
+type DetectionFormat = "sigma" | "splunk" | "pyspark" | "unknown";
+
+function detectFormat(rule: string): DetectionFormat {
+  if (/^title:/m.test(rule) && /logsource:/i.test(rule)) return "sigma";
+  if (/^detection:/m.test(rule) || (/logsource:/i.test(rule) && /condition:/i.test(rule))) return "sigma";
+  if (/index=\w|sourcetype=\w/.test(rule) || /^\|[ \t]*(stats|eval|where|table|transaction)\b/m.test(rule)) return "splunk";
+  if (/from pyspark|spark\.sql|spark\.read|\.filter\(col\(/.test(rule)) return "pyspark";
+  return "unknown";
+}
+
 function scoreDetection(rule: string): QualityScore {
-  const text = rule.toLowerCase();
+  const format = detectFormat(rule);
   const breakdown: QualityScore["breakdown"] = [];
   const strengths: string[] = [];
   const improvements: string[] = [];
 
-  // 1. Completeness (0-25): title, description, logsource, detection, level
+  // ── 1. Completeness (0-25) ── format-aware required fields ──────────────────
   let completeness = 0;
-  if (/title:/i.test(rule)) { completeness += 5; strengths.push("Rule has a title."); }
-  else improvements.push("Add a title field for discoverability.");
-  if (/description:/i.test(rule)) completeness += 5;
-  else improvements.push("Add a description explaining what the rule detects.");
-  if (/logsource:/i.test(rule) || /index=/i.test(rule) || /spark\.read/i.test(rule)) {
-    completeness += 7; strengths.push("Log source is defined.");
+
+  if (format === "sigma") {
+    if (/^title:/m.test(rule)) { completeness += 5; strengths.push("Rule has a title."); }
+    else improvements.push("Add a title field for discoverability.");
+    if (/^description:/m.test(rule)) completeness += 5;
+    else improvements.push("Add a description explaining what the rule detects.");
+    if (/^logsource:/m.test(rule)) { completeness += 7; strengths.push("Log source is defined."); }
+    else improvements.push("Define a logsource block (category and product).");
+    if (/^detection:/m.test(rule)) { completeness += 5; strengths.push("Detection logic is present."); }
+    else improvements.push("Add a detection: block with selection criteria.");
+    if (/^level:/m.test(rule)) completeness += 3;
+    else improvements.push("Add a level field (low/medium/high/critical).");
+  } else if (format === "splunk") {
+    if (/index=\w|sourcetype=\w/.test(rule)) { completeness += 10; strengths.push("Index and sourcetype are specified."); }
+    else improvements.push("Specify an index and sourcetype for the data source.");
+    if (/\|\s*(where|search)\s/i.test(rule)) { completeness += 8; strengths.push("Filter conditions are present."); }
+    else improvements.push("Add a | where or | search clause to filter events.");
+    if (/\|\s*table\s/i.test(rule)) { completeness += 4; strengths.push("Output fields are specified with | table."); }
+    else improvements.push("Add a | table clause to specify output fields.");
+    if (/\|\s*comment\(/i.test(rule)) completeness += 3;
+  } else if (format === "pyspark") {
+    if (/spark\.sql|spark\.read|\.filter\(/.test(rule)) { completeness += 10; strengths.push("PySpark data source and filter are defined."); }
+    else improvements.push("Include a spark.read or spark.sql data source.");
+    if (/col\(/.test(rule)) { completeness += 8; strengths.push("Uses col() for type-safe field references."); }
+    else improvements.push("Use col() references for specific fields.");
+    if (/\.show\(|\.toPandas\(|\.write/.test(rule)) completeness += 4;
+    if (/# |"""/.test(rule)) completeness += 3;
   } else {
-    improvements.push("Define a log source (logsource, index, or data path).");
+    // Unknown format — generic checks
+    if (/title:/i.test(rule)) { completeness += 5; strengths.push("Rule has a title."); }
+    if (/index=|logsource:|filter\(/.test(rule)) { completeness += 10; strengths.push("Data source reference present."); }
+    if (/where |detection:|\.filter\(/.test(rule)) { completeness += 7; strengths.push("Filter/detection logic present."); }
+    if (/level:|severity:/i.test(rule)) completeness += 3;
   }
-  if (/detection:|filter\(|where /i.test(rule)) { completeness += 5; strengths.push("Detection logic is present."); }
-  else improvements.push("Detection logic block is missing.");
-  if (/level:|severity:/i.test(rule)) completeness += 3;
-  else improvements.push("Add a severity/level indicator.");
-  breakdown.push({ label: "Completeness", score: completeness, max: 25, feedback: "Checks for required metadata fields." });
+  breakdown.push({ label: "Completeness", score: completeness, max: 25, feedback: "Checks required fields for this format." });
 
-  // 2. Logic Clarity (0-20): specific field names, not wildcards only
+  // ── 2. Logic Clarity (0-20) ──────────────────────────────────────────────────
   let clarity = 0;
-  const wildcardOnly = (text.match(/\*/g) || []).length;
-  const fieldRefs = (text.match(/col\(|commandline|image|eventname|sourcetype/g) || []).length;
-  if (fieldRefs > 2) { clarity += 10; strengths.push("Uses specific field references."); }
-  else improvements.push("Use named fields instead of broad wildcards.");
-  if (wildcardOnly < 5) clarity += 5;
-  if (/condition:|\.filter\(|where /i.test(rule)) { clarity += 5; strengths.push("Condition logic is explicit."); }
-  breakdown.push({ label: "Logic Clarity", score: clarity, max: 20, feedback: "Evaluates specificity and field usage." });
+  const wildcards = (rule.match(/\*/g) || []).length;
 
-  // 3. Filtering / Noise Reduction (0-20): NOT clauses, filter blocks, excludes
+  if (format === "sigma") {
+    const fieldCount = (rule.match(/^\s{4,}\w[\w.]+(?:\|\w+)*:/gm) || []).length;
+    if (fieldCount >= 2) { clarity += 10; strengths.push("Uses specific field references."); }
+    else improvements.push("Add more specific field conditions to the detection block.");
+    if (wildcards < 5) clarity += 5;
+    if (/condition:/i.test(rule)) { clarity += 5; strengths.push("Condition logic is explicit."); }
+  } else if (format === "splunk") {
+    const fieldConditions = (rule.match(/\b\w[\w.]+\s*(?:=|!=|>|<)\s*["'*\w]/g) || []).length;
+    if (fieldConditions >= 2) { clarity += 10; strengths.push("Uses specific field=value comparisons."); }
+    else improvements.push("Add explicit field comparisons instead of broad wildcards.");
+    if (wildcards < 6) clarity += 5;
+    if (/\|\s*(stats|transaction|eval)\s/i.test(rule)) { clarity += 5; strengths.push("Aggregation or correlation logic is present."); }
+  } else if (format === "pyspark") {
+    const colRefs = (rule.match(/col\(["']\w/g) || []).length;
+    if (colRefs >= 2) { clarity += 10; strengths.push("Uses named col() field references."); }
+    else improvements.push("Use col('field_name') for explicit field references.");
+    if (wildcards < 4) clarity += 5;
+    if (/groupBy|agg\(|orderBy/.test(rule)) { clarity += 5; strengths.push("Aggregation logic is present."); }
+  } else {
+    const fieldRefs = (rule.match(/col\(|commandline|image|eventname|sourcetype/gi) || []).length;
+    if (fieldRefs > 2) { clarity += 10; strengths.push("Uses specific field references."); }
+    else improvements.push("Use named fields instead of broad wildcards.");
+    if (wildcards < 5) clarity += 5;
+    if (/condition:|\.filter\(|where /i.test(rule)) clarity += 5;
+  }
+  breakdown.push({ label: "Logic Clarity", score: clarity, max: 20, feedback: "Evaluates field specificity and condition structure." });
+
+  // ── 3. Noise Reduction (0-20) ────────────────────────────────────────────────
   let filtering = 0;
-  if (/not filter|filter:|NOT |\.filter\(~|where.*not/i.test(rule)) {
+
+  const hasExclusion =
+    /filter:|NOT |not filter|\.filter\(~|where.*not\b|\bNOT\b/i.test(rule) ||
+    /allowlist|whitelist|exclude/i.test(rule);
+
+  if (hasExclusion) {
     filtering += 10; strengths.push("Includes exclusion/filter logic to reduce noise.");
   } else {
     improvements.push("Add exclusion filters for known-good activity to reduce false positives.");
   }
-  if (/falsepositives:|false.positive/i.test(rule)) {
-    filtering += 5; strengths.push("False positives are documented.");
+
+  if (format === "sigma") {
+    if (/^falsepositives:/m.test(rule)) { filtering += 5; strengths.push("False positives are documented."); }
+    else improvements.push("Document expected false positives in a falsepositives: block.");
   } else {
-    improvements.push("Document expected false positives.");
+    if (/false.positive|fp:|# fp/i.test(rule)) { filtering += 5; strengths.push("False positives are documented."); }
+    else improvements.push("Document expected false positives in comments.");
   }
-  if (/threshold|count.*>|> \d+/i.test(rule)) {
+
+  if (/threshold|count.*>|> \d+|\.\s*filter.*count/i.test(rule)) {
     filtering += 5; strengths.push("Threshold-based filtering applied.");
   }
-  breakdown.push({ label: "Noise Reduction", score: filtering, max: 20, feedback: "Assesses exclusions and FP documentation." });
+  breakdown.push({ label: "Noise Reduction", score: filtering, max: 20, feedback: "Assesses exclusions and false positive documentation." });
 
-  // 4. Best Practices (0-20): id, tags/mitre, author, date, references
+  // ── 4. Best Practices (0-20) ─────────────────────────────────────────────────
   let bestPractice = 0;
-  if (/^id:/im.test(rule)) { bestPractice += 4; }
-  else improvements.push("Add a unique rule ID.");
-  if (/tags:|mitre|t1\d{3}/i.test(rule)) { bestPractice += 6; strengths.push("MITRE ATT&CK tags are present."); }
-  else improvements.push("Map to MITRE ATT&CK technique IDs.");
-  if (/author:/i.test(rule)) bestPractice += 4;
-  else improvements.push("Add an author field for attribution.");
-  if (/date:|updated:/i.test(rule)) bestPractice += 3;
-  if (/references?:/i.test(rule)) { bestPractice += 3; strengths.push("References included."); }
+
+  if (format === "sigma") {
+    if (/^id:/m.test(rule)) bestPractice += 4;
+    else improvements.push("Add a unique rule ID (UUID or slug).");
+    if (/^tags:/m.test(rule) || /t1\d{3}/i.test(rule)) { bestPractice += 6; strengths.push("MITRE ATT&CK tags are present."); }
+    else improvements.push("Map to MITRE ATT&CK technique IDs in the tags: block.");
+    if (/^author:/m.test(rule)) bestPractice += 4;
+    else improvements.push("Add an author field for attribution.");
+    if (/^date:/m.test(rule) || /^modified:/m.test(rule)) bestPractice += 3;
+    if (/^references?:/m.test(rule)) { bestPractice += 3; strengths.push("References included."); }
+  } else {
+    // Non-Sigma: check for comments with equivalent metadata
+    if (/# detection:|\/\/ detection:|comment\(/i.test(rule)) { bestPractice += 4; }
+    else improvements.push("Add a comment header identifying this rule (name, author, purpose).");
+    if (/t1\d{3}|mitre/i.test(rule)) { bestPractice += 6; strengths.push("MITRE ATT&CK reference present."); }
+    else improvements.push("Reference the relevant MITRE ATT&CK technique ID in a comment.");
+    if (/author:|# by |\/\/ by /i.test(rule)) bestPractice += 4;
+    else improvements.push("Add an author comment for attribution.");
+    if (/\d{4}[-/]\d{2}[-/]\d{2}/.test(rule)) bestPractice += 3;
+    if (/https?:\/\//.test(rule)) { bestPractice += 3; strengths.push("External references included."); }
+  }
   breakdown.push({ label: "Best Practices", score: bestPractice, max: 20, feedback: "Checks IDs, MITRE mapping, attribution, references." });
 
-  // 5. Operability (0-15): required fields, deployment notes, tuning guidance
+  // ── 5. Operability (0-15) ────────────────────────────────────────────────────
   let operability = 0;
-  if (/required.field|requiredfields/i.test(rule)) { operability += 5; strengths.push("Required fields are listed."); }
-  if (/deployment|logsource|index=/i.test(rule)) { operability += 5; strengths.push("Deployment context is included."); }
-  else improvements.push("Add deployment or logsource context for operators.");
-  if (/tuning|whitelist|allowlist|exclude/i.test(rule)) operability += 5;
-  breakdown.push({ label: "Operability", score: operability, max: 15, feedback: "Checks deployment and tuning guidance." });
+
+  if (format === "sigma") {
+    if (/logsource:/i.test(rule)) { operability += 5; strengths.push("Logsource context aids deployment."); }
+    if (/^status:/m.test(rule)) operability += 3;
+    else improvements.push("Set a status field (experimental/stable/production).");
+    if (/tuning|filter:|exclude/i.test(rule)) { operability += 4; }
+    if (/timeframe:/i.test(rule)) { operability += 3; strengths.push("Time window is defined."); }
+  } else if (format === "splunk") {
+    if (/index=\w/.test(rule)) { operability += 5; strengths.push("Index is specified for deployment."); }
+    if (/\|\s*sort\s/i.test(rule)) operability += 3;
+    if (/earliest=|latest=|span=/i.test(rule)) { operability += 4; strengths.push("Time bounds are defined."); }
+    else improvements.push("Add time bounds (earliest=/latest= or span=) for scheduled alerting.");
+    if (/\|\s*alert\b|\|\s*sendalert/i.test(rule)) operability += 3;
+  } else if (format === "pyspark") {
+    if (/spark\.read|\.load\(/.test(rule)) { operability += 5; strengths.push("Data read path is defined."); }
+    if (/\.write|\.save/.test(rule)) operability += 3;
+    if (/\d{4}-\d{2}-\d{2}|start_date|end_date/i.test(rule)) { operability += 4; strengths.push("Date range is parameterized."); }
+    else improvements.push("Parameterize the date range for scheduled execution.");
+    if (/SparkSession|spark = /.test(rule)) operability += 3;
+  } else {
+    if (/deployment|logsource|index=/i.test(rule)) { operability += 5; }
+    else improvements.push("Add deployment context for operators.");
+    if (/tuning|whitelist|allowlist|exclude/i.test(rule)) operability += 5;
+  }
+  breakdown.push({ label: "Operability", score: operability, max: 15, feedback: "Checks deployment guidance and scheduling context." });
 
   const total = completeness + clarity + filtering + bestPractice + operability;
 
-  // Deduplicate
   const uniqueStrengths = Array.from(new Set(strengths)).slice(0, 4);
   const uniqueImprovements = Array.from(new Set(improvements)).slice(0, 4);
 
-  return { total, breakdown, strengths: uniqueStrengths, improvements: uniqueImprovements };
+  const formatLabel =
+    format === "sigma" ? "Sigma YAML" :
+    format === "splunk" ? "Splunk SPL" :
+    format === "pyspark" ? "PySpark" : "Unknown format";
+
+  return { total, format: formatLabel, breakdown, strengths: uniqueStrengths, improvements: uniqueImprovements };
 }
 
 const QUALITY_PLACEHOLDER = `# Paste any detection rule here to evaluate its quality.
@@ -353,6 +460,8 @@ export default function PlaygroundPage() {
   const [logs, setLogs] = useState(sampleLogs.exfiltration.join("\n"));
   const [result, setResult] = useState<SimResult | null>(null);
   const [running, setRunning] = useState(false);
+
+  useEffect(() => { document.title = "Playground — AIDetectLab"; }, []);
 
   // Quality scorer
   const [qualityRule, setQualityRule] = useState(QUALITY_PLACEHOLDER);
@@ -394,6 +503,7 @@ export default function PlaygroundPage() {
             title="Detection Workbench"
             description="Write, test, and validate detections against simulated attack scenarios."
             className="mb-0"
+            accent="yellow"
           />
         </div>
 
@@ -443,7 +553,7 @@ export default function PlaygroundPage() {
             <div className="h-[360px]">
               <MonacoEditor
                 height="100%"
-                language="javascript"
+                language={scenarioLanguage[scenario]}
                 value={query}
                 onChange={(v) => setQuery(v || "")}
                 theme="vs-dark"
@@ -610,7 +720,7 @@ export default function PlaygroundPage() {
                         {qualityResult.total >= 75 ? "Good Rule" :
                          qualityResult.total >= 50 ? "Needs Improvement" : "Poor Quality"}
                       </p>
-                      <p className="text-xs text-gray-500">out of 100 points</p>
+                      <p className="text-xs text-gray-500">out of 100 · <span className="text-gray-600">{qualityResult.format}</span></p>
                       <div className="mt-2 w-32 bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${

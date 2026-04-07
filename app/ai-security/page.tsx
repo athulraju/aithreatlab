@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { Badge } from "@/components/Badge";
 import {
   owaspLLMTop10,
   owaspAgenticTop10,
@@ -21,6 +20,8 @@ import {
   ChevronUp,
   Zap,
   Wrench,
+  ChevronsDownUp,
+  ChevronsUpDown,
 } from "lucide-react";
 
 function getCurrentSpotlight() {
@@ -30,13 +31,19 @@ function getCurrentSpotlight() {
   return active || researchSpotlights[0];
 }
 
-function OWASPCard({ item }: { item: OWASPItem }) {
-  const [expanded, setExpanded] = useState(false);
-
+function OWASPCard({
+  item,
+  expanded,
+  onToggle,
+}: {
+  item: OWASPItem;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   return (
     <div className="card-surface overflow-hidden">
       <button
-        onClick={() => setExpanded(!expanded)}
+        onClick={onToggle}
         className="w-full p-5 text-left flex items-start gap-4"
       >
         <div className="flex-shrink-0">
@@ -63,9 +70,9 @@ function OWASPCard({ item }: { item: OWASPItem }) {
           </div>
           <p className="text-xs text-gray-500 leading-relaxed">{item.description}</p>
         </div>
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 mt-0.5">
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-600" />
+            <ChevronUp className="w-4 h-4 text-gray-500" />
           ) : (
             <ChevronDown className="w-4 h-4 text-gray-600" />
           )}
@@ -162,9 +169,37 @@ function OWASPCard({ item }: { item: OWASPItem }) {
 
 export default function AISecurityPage() {
   const [activeTab, setActiveTab] = useState<"llm" | "agentic">("llm");
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const spotlight = getCurrentSpotlight();
 
+  useEffect(() => { document.title = "AI Security — AIDetectLab"; }, []);
+
   const activeList = activeTab === "llm" ? owaspLLMTop10 : owaspAgenticTop10;
+  const allIds = activeList.map((i) => i.id);
+  const allExpanded = allIds.every((id) => expandedIds.has(id));
+
+  // Reset expanded state when switching tabs
+  const handleTabChange = (tab: "llm" | "agentic") => {
+    setActiveTab(tab);
+    setExpandedIds(new Set());
+  };
+
+  const handleToggle = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleExpandAll = () => {
+    if (allExpanded) {
+      setExpandedIds(new Set());
+    } else {
+      setExpandedIds(new Set(allIds));
+    }
+  };
 
   return (
     <div className="pt-14 min-h-screen">
@@ -173,6 +208,7 @@ export default function AISecurityPage() {
           eyebrow="AI Security"
           title="AI & LLM Threat Detection"
           description="OWASP Top 10 for LLMs and Agentic AI — with detection guidance, monitoring requirements, and practical threat models."
+          accent="purple"
         />
 
         {/* Research Spotlight Banner */}
@@ -215,35 +251,64 @@ export default function AISecurityPage() {
           ))}
         </div>
 
-        {/* OWASP Tabs */}
-        <div className="flex gap-1 mb-6 p-1 bg-white/[0.03] border border-white/[0.06] rounded-lg w-fit">
-          <button
-            onClick={() => setActiveTab("llm")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === "llm"
-                ? "bg-white/10 text-white"
-                : "text-gray-500 hover:text-gray-300"
-            }`}
-          >
-            <Brain className="w-3.5 h-3.5" />
-            OWASP LLM Top 10
-          </button>
-          <button
-            onClick={() => setActiveTab("agentic")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === "agentic"
-                ? "bg-white/10 text-white"
-                : "text-gray-500 hover:text-gray-300"
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5" />
-            OWASP Agentic Top 10
-          </button>
+        {/* OWASP Tabs + expand/collapse controls */}
+        <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+          <div className="flex gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-lg">
+            <button
+              onClick={() => handleTabChange("llm")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                activeTab === "llm"
+                  ? "bg-white/10 text-white"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              <Brain className="w-3.5 h-3.5" />
+              OWASP LLM Top 10
+            </button>
+            <button
+              onClick={() => handleTabChange("agentic")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                activeTab === "agentic"
+                  ? "bg-white/10 text-white"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              <Zap className="w-3.5 h-3.5" />
+              OWASP Agentic Top 10
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-600">
+              {expandedIds.size} of {allIds.length} expanded
+            </span>
+            <button
+              onClick={handleExpandAll}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-gray-400 hover:text-white transition-all"
+            >
+              {allExpanded ? (
+                <>
+                  <ChevronsDownUp className="w-3.5 h-3.5" />
+                  Collapse All
+                </>
+              ) : (
+                <>
+                  <ChevronsUpDown className="w-3.5 h-3.5" />
+                  Expand All
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {activeList.map((item) => (
-            <OWASPCard key={item.id} item={item} />
+            <OWASPCard
+              key={item.id}
+              item={item}
+              expanded={expandedIds.has(item.id)}
+              onToggle={() => handleToggle(item.id)}
+            />
           ))}
         </div>
       </div>

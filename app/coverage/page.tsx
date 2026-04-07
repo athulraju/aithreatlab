@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { coverageData, coverageLayers, CoverageItem } from "@/lib/data/coverage";
 import { maturityColor } from "@/lib/utils";
-import { Brain, Download, Filter, BarChart3, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Brain, Download, Filter, BarChart3, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 
 const coverageTypeColor: Record<string, string> = {
   "rule-based": "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
@@ -13,9 +14,43 @@ const coverageTypeColor: Record<string, string> = {
   planned: "text-gray-500 bg-gray-500/10 border-gray-500/20",
 };
 
+function exportCSV() {
+  const headers = ["ID", "Name", "Layer", "Subcategory", "Data Source", "Platform", "MITRE", "Coverage Type", "Maturity", "AI Security", "Detection Link"];
+  const rows = coverageData.map((item) => [
+    item.id,
+    item.name,
+    item.layer,
+    item.subcategory,
+    item.dataSource,
+    item.platform,
+    item.mitreTechnique,
+    item.coverageType,
+    item.maturity,
+    item.aiSecurity ? "Yes" : "No",
+    item.detectionId ? `/detections/${item.detectionId}` : "",
+  ]);
+  const csv = [headers, ...rows]
+    .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "detection-coverage.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function CoveragePage() {
   const [selectedLayer, setSelectedLayer] = useState<string>("All");
   const [showAiOnly, setShowAiOnly] = useState(false);
+
+  useEffect(() => { document.title = "Coverage Framework — AIDetectLab"; }, []);
+
+  const maxBarTotal = Math.max(
+    1,
+    ...coverageLayers.map((layer) => coverageData.filter((i) => i.layer === layer).length)
+  );
 
   const filtered = coverageData.filter((item) => {
     if (selectedLayer !== "All" && item.layer !== selectedLayer) return false;
@@ -38,8 +73,12 @@ export default function CoveragePage() {
             title="Detection Coverage Map"
             description="Structured visibility across 8 detection layers with MITRE mapping and maturity tracking."
             className="mb-0"
+            accent="purple"
           />
-          <button className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-sm text-gray-400 hover:text-white transition-all mt-1">
+          <button
+            onClick={exportCSV}
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-sm text-gray-400 hover:text-white transition-all mt-1"
+          >
             <Download className="w-4 h-4" />
             Export CSV
           </button>
@@ -75,7 +114,6 @@ export default function CoveragePage() {
               const exp = layerItems.filter((i) => i.maturity === "experimental").length;
               const plan = layerItems.filter((i) => i.maturity === "planned").length;
               const total = layerItems.length;
-              const maxTotal = 5;
 
               return (
                 <div key={layer} className="flex items-center gap-3">
@@ -84,28 +122,28 @@ export default function CoveragePage() {
                     {prod > 0 && (
                       <div
                         className="bg-emerald-500 h-full"
-                        style={{ width: `${(prod / maxTotal) * 100}%` }}
+                        style={{ width: `${(prod / maxBarTotal) * 100}%` }}
                         title={`Production: ${prod}`}
                       />
                     )}
                     {stable > 0 && (
                       <div
                         className="bg-cyan-500 h-full"
-                        style={{ width: `${(stable / maxTotal) * 100}%` }}
+                        style={{ width: `${(stable / maxBarTotal) * 100}%` }}
                         title={`Stable: ${stable}`}
                       />
                     )}
                     {exp > 0 && (
                       <div
                         className="bg-purple-500 h-full"
-                        style={{ width: `${(exp / maxTotal) * 100}%` }}
+                        style={{ width: `${(exp / maxBarTotal) * 100}%` }}
                         title={`Experimental: ${exp}`}
                       />
                     )}
                     {plan > 0 && (
                       <div
                         className="bg-gray-600 h-full"
-                        style={{ width: `${(plan / maxTotal) * 100}%` }}
+                        style={{ width: `${(plan / maxBarTotal) * 100}%` }}
                         title={`Planned: ${plan}`}
                       />
                     )}
@@ -195,7 +233,7 @@ export default function CoveragePage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((item, i) => (
+                {filtered.map((item) => (
                   <tr
                     key={item.id}
                     className={`border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors ${
@@ -203,10 +241,24 @@ export default function CoveragePage() {
                     }`}
                   >
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="text-white font-medium mb-0.5">{item.name}</p>
-                        <p className="text-gray-600 text-xs">{item.subcategory}</p>
-                      </div>
+                      {item.detectionId ? (
+                        <Link href={`/detections/${item.detectionId}`} className="group/link block">
+                          <div className="flex items-start gap-1.5">
+                            <div>
+                              <p className="text-white font-medium mb-0.5 group-hover/link:text-cyan-300 transition-colors">
+                                {item.name}
+                              </p>
+                              <p className="text-gray-600 text-xs">{item.subcategory}</p>
+                            </div>
+                            <ExternalLink className="w-3 h-3 text-gray-700 group-hover/link:text-cyan-400 flex-shrink-0 mt-0.5 transition-colors" />
+                          </div>
+                        </Link>
+                      ) : (
+                        <div>
+                          <p className="text-white font-medium mb-0.5">{item.name}</p>
+                          <p className="text-gray-600 text-xs">{item.subcategory}</p>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-400 whitespace-nowrap">{item.layer}</td>
                     <td className="px-4 py-3 text-gray-500 max-w-[160px] truncate" title={item.dataSource}>

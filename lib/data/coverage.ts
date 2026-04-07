@@ -11,6 +11,7 @@ export interface CoverageItem {
   maturity: "production" | "stable" | "experimental" | "planned";
   aiSecurity: boolean;
   notes: string;
+  detectionId?: string;
 }
 
 export const coverageLayers = [
@@ -39,6 +40,7 @@ export const coverageData: CoverageItem[] = [
     maturity: "production",
     aiSecurity: false,
     notes: "Covers most T1059 sub-techniques",
+    detectionId: "det-001",
   },
   {
     id: "cov-002",
@@ -81,6 +83,7 @@ export const coverageData: CoverageItem[] = [
     maturity: "production",
     aiSecurity: false,
     notes: "Critical coverage — low tolerance for gaps",
+    detectionId: "det-002",
   },
   // Host Application
   {
@@ -212,6 +215,7 @@ export const coverageData: CoverageItem[] = [
     maturity: "production",
     aiSecurity: false,
     notes: "Calculate distance/time ratio between consecutive logins",
+    detectionId: "det-003",
   },
   {
     id: "cov-014",
@@ -284,6 +288,7 @@ export const coverageData: CoverageItem[] = [
     maturity: "experimental",
     aiSecurity: true,
     notes: "Pattern matching + semantic similarity detection",
+    detectionId: "det-004",
   },
   {
     id: "cov-019",
@@ -298,6 +303,7 @@ export const coverageData: CoverageItem[] = [
     maturity: "experimental",
     aiSecurity: true,
     notes: "Requires structured agent audit logging",
+    detectionId: "asi02-001",
   },
   {
     id: "cov-020",

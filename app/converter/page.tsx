@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/PageHeader";
 import { Badge } from "@/components/Badge";
@@ -71,6 +71,8 @@ export default function ConverterPage() {
   const [result, setResult] = useState<ConversionResult | null>(null);
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => { document.title = "Converter — AIDetectLab"; }, []);
+
   const handleConvert = useCallback(() => {
     const r = convert(inputValue, inputFormat, outputFormat);
     setResult(r);
@@ -124,6 +126,7 @@ export default function ConverterPage() {
           eyebrow="Converter"
           title="Detection Format Converter"
           description="Translate detections between Sigma, Splunk SPL, and PySpark with validation and translation notes."
+          accent="cyan"
         />
 
         {/* Format selectors + convert */}
@@ -182,15 +185,15 @@ export default function ConverterPage() {
         </div>
 
         {/* Sample rules */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
           <span className="text-xs text-gray-600">Load sample:</span>
-          {detections.slice(0, 3).map((d) => (
+          {detections.slice(0, 5).map((d) => (
             <button
               key={d.id}
               onClick={() => handleLoadSample(d.id)}
-              className="text-xs text-gray-500 hover:text-cyan-400 underline underline-offset-2 transition-colors"
+              className="text-xs font-mono text-gray-500 hover:text-cyan-400 bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/30 px-2 py-0.5 rounded transition-all"
             >
-              {d.title.split(" ").slice(0, 3).join(" ")}...
+              {d.id}
             </button>
           ))}
         </div>

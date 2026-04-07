@@ -9,17 +9,20 @@ export default function AboutPage() {
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1 tracking-tight">
           Athul Raju
         </h1>
-        <p className="text-base text-gray-400 mb-8">Detection & Response Engineer · AI Security Researcher</p>
+        <p className="text-base text-gray-400 mb-8">Senior Principal Threat Detection Engineer · AI Security Researcher</p>
 
         <div className="space-y-4 text-gray-400 leading-relaxed mb-10">
           <p>
-            Detection engineer focused on building scalable, portable, and operationally effective detections across cloud, endpoint, identity, and AI security domains. I work across Sigma, Splunk SPL, PySpark, and cloud-native platforms to bridge the gap between raw telemetry and actionable security logic.
+            Detection engineer focused on building scalable, portable, and operationally effective detections across cloud, endpoint, identity, and AI-driven systems.
           </p>
           <p>
-            AIDetectLab reflects my approach to detection engineering — structured coverage frameworks, multi-format rule portability, behavioral analytics at scale, and staying ahead of emerging threats in AI-integrated environments including OCI cloud and autonomous agent systems.
+            AIDetectLab reflects a structured approach to detection engineering, combining coverage frameworks, multi-format rule portability, and behavioral analytics at scale. The focus is on translating raw telemetry into high-fidelity detection logic across OCI and modern AI-integrated environments.
+          </p>
+          <p>
+            Current focus includes detection engineering for agentic AI systems, OWASP LLM and Agentic Top 10 threat coverage, and OCI cloud detection patterns.
           </p>
           <p className="text-gray-500 text-sm">
-            Current focus: detection engineering for agentic AI systems, OWASP LLM and Agentic Top 10 threat coverage, and OCI cloud detection patterns.
+            Current Research: AI misalignment and rogue behavior, extreme class imbalance in security data, and behavioral detection of goal drift in agentic systems.
           </p>
         </div>
 

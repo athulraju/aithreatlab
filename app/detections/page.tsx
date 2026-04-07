@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { Badge } from "@/components/Badge";
@@ -18,6 +18,8 @@ export default function DetectionsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPlatform, setSelectedPlatform] = useState("All");
   const [selectedMaturity, setSelectedMaturity] = useState("All");
+
+  useEffect(() => { document.title = "Detection Library — AIDetectLab"; }, []);
 
   const filtered = useMemo(() => {
     return detections.filter((d) => {
@@ -48,6 +50,7 @@ export default function DetectionsPage() {
           eyebrow="Detection Library"
           title="Detection Knowledge Base"
           description="Searchable library of production-grade detections with full logic, tuning guidance, and deployment notes."
+          accent="blue"
         />
 
         {/* Search + Filters */}
@@ -166,8 +169,11 @@ export default function DetectionsPage() {
 
           {filtered.length === 0 && (
             <div className="text-center py-16 text-gray-600">
-              <Filter className="w-8 h-8 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">No detections match your filters.</p>
+              <Filter className="w-8 h-8 mx-auto mb-3 opacity-30" />
+              <p className="text-sm text-gray-500 mb-1">No detections match your current filters.</p>
+              <p className="text-xs text-gray-600">
+                Try clearing the category or platform filter, or search by a different term.
+              </p>
             </div>
           )}
         </div>

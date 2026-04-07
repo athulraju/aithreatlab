@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { researchSections, sectionColors, sourceColors } from "@/lib/data/research";
 import { ExternalLink } from "lucide-react";
 
 export default function ResearchPage() {
   const [activeSection, setActiveSection] = useState<string>("all");
+  useEffect(() => { document.title = "Research — AIDetectLab"; }, []);
 
   const visibleSections =
     activeSection === "all"
@@ -20,6 +21,7 @@ export default function ResearchPage() {
           eyebrow="Research"
           title="Research Reference"
           description="Curated papers, reports, and resources across AI security, agentic AI, detection engineering, and LLM security."
+          accent="gray"
         />
 
         {/* Section filter tabs */}
