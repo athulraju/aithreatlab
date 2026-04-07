@@ -21,7 +21,7 @@ export default function AboutPage() {
           <p>
             Current focus includes detection engineering for agentic AI systems, OWASP LLM and Agentic Top 10 threat coverage, and OCI cloud detection patterns.
           </p>
-          <p className="text-gray-500 text-sm">
+          <p>
             Current Research: AI misalignment and rogue behavior, extreme class imbalance in security data, and behavioral detection of goal drift in agentic systems.
           </p>
         </div>
