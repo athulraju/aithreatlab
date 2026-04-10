@@ -18,9 +18,10 @@ const primaryLinks = [
 
 // Secondary nav — in "More" dropdown on desktop, flat in mobile menu
 const secondaryLinks = [
-  { href: "/converter", label: "Converter" },
-  { href: "/research",  label: "Research" },
-  { href: "/about",     label: "About" },
+  { href: "/converter",              label: "Converter" },
+  { href: "/research",               label: "Research" },
+  { href: "/research-to-detection",  label: "R2D" },
+  { href: "/about",                  label: "About" },
 ];
 
 const allLinks = [...primaryLinks, ...secondaryLinks];
