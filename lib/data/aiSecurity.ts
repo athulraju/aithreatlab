@@ -722,6 +722,7 @@ export const researchSpotlights = [
       "Analysis of how retrieval-augmented generation pipelines introduce a novel injection surface, with detection approaches based on retrieval tracing and output comparison.",
     tag: "Prompt Injection",
     cta: "Read Research",
+    href: "https://arxiv.org/html/2601.10923v2",
     startDay: 0,
     status: "published" as const,
   },

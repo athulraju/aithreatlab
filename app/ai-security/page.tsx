@@ -263,10 +263,22 @@ export default function AISecurityPage() {
               </div>
             </div>
             {spotlight.status === "published" && (
-              <button className="flex-shrink-0 flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-medium transition-colors group">
-                {spotlight.cta}
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-150" />
-              </button>
+              spotlight.href ? (
+                <a
+                  href={spotlight.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-medium transition-colors group"
+                >
+                  {spotlight.cta}
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-150" />
+                </a>
+              ) : (
+                <button className="flex-shrink-0 flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-medium transition-colors group">
+                  {spotlight.cta}
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-150" />
+                </button>
+              )
             )}
           </div>
         </motion.div>
