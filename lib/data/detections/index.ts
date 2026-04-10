@@ -2,12 +2,14 @@ export type { Detection } from "./types";
 export { coreDetections } from "./core";
 export { ociDetections } from "./oci";
 export { asiDetections } from "./oci-linux-asi";
+export { llmDetections } from "./llm";
 
 import { coreDetections } from "./core";
 import { ociDetections } from "./oci";
 import { asiDetections } from "./oci-linux-asi";
+import { llmDetections } from "./llm";
 
-export const detections = [...coreDetections, ...ociDetections, ...asiDetections];
+export const detections = [...coreDetections, ...ociDetections, ...asiDetections, ...llmDetections];
 
 export const getDetectionById = (id: string) =>
   detections.find((d) => d.id === id);

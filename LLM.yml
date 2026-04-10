@@ -1,0 +1,1772 @@
+---
+title: LLM Service Spawning Shell Interpreter
+owasp top 10: LLM01:2025 Prompt Injection
+id: 47bcc2f2-6747-4641-becc-353c97cedd59
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /bash
+    - /sh
+    - /zsh
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.execution
+- ai.llm
+- llm01.prompt-injection
+---
+title: LLM Service Calling OCI CLI After Prompt Handling
+owasp top 10: LLM01:2025 Prompt Injection
+id: 9811f41e-54cd-444a-8353-81ca16e13036
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /oci
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.execution
+- attack.discovery
+- ai.llm
+- llm01.prompt-injection
+---
+title: LLM Service Reading User Supplied Files From Temp Or Upload Paths
+owasp top 10: LLM01:2025 Prompt Injection
+id: 41fe1ca6-526d-4846-b10c-bfd16eaf9eb8
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - /tmp/
+    - /var/tmp/
+    - /uploads/
+    - /tmp/gradio/
+    - /tmp/streamlit/
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm01.prompt-injection
+---
+title: LLM Service Connecting To New External Destination After Request Processing
+owasp top 10: LLM01:2025 Prompt Injection
+id: 4cdfa1e0-b924-427c-addc-22b623c70527
+status: experimental
+logsource:
+  category: network_connection
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  filter_oci:
+    DestinationHostname|endswith:
+    - .oraclecloud.com
+    - .oci.oraclecloud.com
+    - .oracle.com
+  filter_private:
+    DestinationIp|cidr:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+  condition: selection_proc and not 1 of filter_*
+fields:
+- Image
+- DestinationHostname
+- DestinationIp
+- DestinationPort
+- User
+- ComputerName
+level: medium
+tags:
+- attack.command-and-control
+- ai.llm
+- llm01.prompt-injection
+---
+title: LLM Service Writing Script To Temp Path
+owasp top 10: LLM01:2025 Prompt Injection
+id: 23509473-62ad-4d3c-b267-8ef4baa63c15
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_path:
+    TargetFilename|contains:
+    - /tmp/
+    - /var/tmp/
+  selection_ext:
+    TargetFilename|endswith:
+    - .sh
+    - .py
+    - .pl
+  condition: selection_proc and selection_path and selection_ext
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.defense-evasion
+- ai.llm
+- llm01.prompt-injection
+---
+title: LLM Service Accessing OCI Config Or API Key Material
+owasp top 10: LLM02:2025 Sensitive Information Disclosure
+id: 1827b363-27b1-426f-9b36-afca943d3fd8
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - /.oci/config
+    - /.oci/oci_api_key
+    - /etc/oci/
+    - /home/opc/.oci/
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.credential-access
+- ai.llm
+- llm02.sensitive-information-disclosure
+---
+title: LLM Service Reading SSH Private Keys
+owasp top 10: LLM02:2025 Sensitive Information Disclosure
+id: 6b2076e6-9ec9-4ffb-a750-d270826245ed
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - id_rsa
+    - id_ed25519
+    - .pem
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.credential-access
+- ai.llm
+- llm02.sensitive-information-disclosure
+---
+title: LLM Service Accessing Environment Secrets Files
+owasp top 10: LLM02:2025 Sensitive Information Disclosure
+id: 8e71b4df-90e8-452d-8993-00f1f484b952
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - .env
+    - .env.prod
+    - .env.production
+    - .netrc
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.credential-access
+- ai.llm
+- llm02.sensitive-information-disclosure
+---
+title: LLM Service Compressing Potentially Sensitive Data
+owasp top 10: LLM02:2025 Sensitive Information Disclosure
+id: aaedf293-33c9-48f4-8c9b-9734f5042258
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /tar
+    - /zip
+    - /gzip
+  selection_args:
+    CommandLine|contains:
+    - /home/
+    - /srv/
+    - /app/
+    - /models/
+  condition: selection_parent and selection_child and selection_args
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm02.sensitive-information-disclosure
+---
+title: LLM Service Outbound Connection To Object Storage Outside OCI Baseline
+owasp top 10: LLM02:2025 Sensitive Information Disclosure
+id: 8870d11f-8066-4350-b1a2-0ebcf97ebf9c
+status: experimental
+logsource:
+  category: network_connection
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_host:
+    DestinationHostname|contains:
+    - objectstorage
+    - s3
+    - blob.core
+    - storage.googleapis
+  filter_oci:
+    DestinationHostname|contains:
+    - objectstorage.
+    - oraclecloud.com
+  condition: selection_proc and selection_host and not filter_oci
+fields:
+- Image
+- DestinationHostname
+- DestinationIp
+- DestinationPort
+- User
+- ComputerName
+level: medium
+tags:
+- attack.exfiltration
+- ai.llm
+- llm02.sensitive-information-disclosure
+---
+title: LLM Host Installing Python Packages From Unapproved Repository
+owasp top 10: LLM03:2025 Supply Chain
+id: 1368acf2-3d53-4f95-976a-4eb9e1bfedf9
+status: experimental
+logsource:
+  category: network_connection
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /pip
+    - /pip3
+    - /python
+    - /python3
+    - /uv
+  filter_allowed:
+    DestinationHostname|endswith:
+    - pypi.org
+    - files.pythonhosted.org
+    - .oracle.com
+    - .oraclecloud.com
+  condition: selection_proc and not filter_allowed
+fields:
+- Image
+- DestinationHostname
+- DestinationIp
+- DestinationPort
+- User
+- ComputerName
+level: medium
+tags:
+- attack.resource-development
+- ai.llm
+- llm03.supply-chain
+---
+title: LLM Host Installing Node Packages From Unapproved Registry
+owasp top 10: LLM03:2025 Supply Chain
+id: fc9bade8-f2f8-463f-8898-3f0b261a28b5
+status: experimental
+logsource:
+  category: network_connection
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /npm
+    - /yarn
+    - /node
+  filter_allowed:
+    DestinationHostname|endswith:
+    - registry.npmjs.org
+    - .oracle.com
+    - .oraclecloud.com
+  condition: selection_proc and not filter_allowed
+fields:
+- Image
+- DestinationHostname
+- DestinationIp
+- User
+- ComputerName
+level: medium
+tags:
+- attack.resource-development
+- ai.llm
+- llm03.supply-chain
+---
+title: LLM Runtime Writing New Plugin Or Extension Files
+owasp top 10: LLM03:2025 Supply Chain
+id: 70f0c0b3-2393-488e-86a6-873b95daabc7
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - /plugins/
+    - /extensions/
+    - /mcp/
+    - /tools/
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.persistence
+- ai.llm
+- llm03.supply-chain
+---
+title: LLM Service Loading Model From Temporary Directory
+owasp top 10: LLM03:2025 Supply Chain
+id: 8dc3ee68-2bce-43fa-8e13-4de1241fce43
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /python
+    - /python3
+    - /ollama
+    - /vllm
+  selection_cmd:
+    CommandLine|contains:
+    - /tmp/
+    - /var/tmp/
+    - /dev/shm/
+  condition: selection_proc and selection_cmd
+fields:
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.execution
+- ai.llm
+- llm03.supply-chain
+---
+title: LLM Host Modifying Package Or Dependency Configuration
+owasp top 10: LLM03:2025 Supply Chain
+id: ea73d54a-ac4b-4183-950b-678c0ac9c5f1
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - requirements.txt
+    - poetry.lock
+    - pyproject.toml
+    - package.json
+    - package-lock.json
+    - pip.conf
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.persistence
+- ai.llm
+- llm03.supply-chain
+---
+title: LLM Training Or Fine Tune Data Files Modified
+owasp top 10: LLM04:2025 Data and Model Poisoning
+id: 3413651e-e845-4291-8f69-988fd9d2e39e
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - .jsonl
+    - .parquet
+    - .csv
+    - .arrow
+  selection_path:
+    TargetFilename|contains:
+    - /training/
+    - /finetune/
+    - /datasets/
+    - /embeddings/
+  condition: selection_proc and selection_file and selection_path
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm04.data-and-model-poisoning
+---
+title: LLM Model Weights Modified On Disk
+owasp top 10: LLM04:2025 Data and Model Poisoning
+id: 01722838-4b85-4473-bf1c-ae717ab2575b
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - .bin
+    - .safetensors
+    - .gguf
+    - .pt
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm04.data-and-model-poisoning
+---
+title: Unexpected Process Editing Embedding Or Retrieval Data Store
+owasp top 10: LLM04:2025 Data and Model Poisoning
+id: 620015ba-df91-4f88-b31c-16754bd6f9f2
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /sed
+    - /awk
+    - /python
+    - /python3
+    - /perl
+  selection_file:
+    TargetFilename|contains:
+    - /embeddings/
+    - /vector/
+    - /faiss/
+    - /chroma/
+    - /qdrant/
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.impact
+- ai.llm
+- llm04.data-and-model-poisoning
+---
+title: OCI CLI Writing New Training Data From Object Storage
+owasp top 10: LLM04:2025 Data and Model Poisoning
+id: 3e551771-0c70-4ce0-ba45-8247277b6356
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /oci
+  selection_cmd:
+    CommandLine|contains:
+    - object-storage
+    - os object
+    - bulk-download
+    - get --name
+  condition: selection_parent and selection_child and selection_cmd
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm04.data-and-model-poisoning
+---
+title: LLM Dataset Replaced From Temporary Or User Home Path
+owasp top 10: LLM04:2025 Data and Model Poisoning
+id: 51e303ce-36ad-402e-9ae7-18ce644e02ed
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /cp
+    - /mv
+    - /rsync
+  selection_cmd:
+    CommandLine|contains:
+    - /tmp/
+    - /var/tmp/
+    - /home/
+  selection_target:
+    CommandLine|contains:
+    - /training/
+    - /datasets/
+    - /embeddings/
+  condition: selection_proc and selection_cmd and selection_target
+fields:
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm04.data-and-model-poisoning
+---
+title: LLM Service Spawning Shell With Inline Command
+owasp top 10: LLM05:2025 Improper Output Handling
+id: ca4c8a5e-2d0f-4d2d-907e-fcf8c6997a5e
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /bash
+    - /sh
+  selection_cmd:
+    CommandLine|contains:
+    - ' -c '
+    - bash -c
+    - sh -c
+  condition: selection_parent and selection_child and selection_cmd
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.execution
+- ai.llm
+- llm05.improper-output-handling
+---
+title: LLM Service Launching SQL Client From Generated Workflow
+owasp top 10: LLM05:2025 Improper Output Handling
+id: 293a6a4f-1643-4038-9ef8-2be1b6163d09
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /psql
+    - /mysql
+    - /sqlite3
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm05.improper-output-handling
+---
+title: LLM Service Writing Web Executable Content
+owasp top 10: LLM05:2025 Improper Output Handling
+id: c93f7cba-625e-428a-ad61-f9d3efafdd2d
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_path:
+    TargetFilename|contains:
+    - /var/www/
+    - /usr/share/nginx/html/
+    - /srv/www/
+  selection_ext:
+    TargetFilename|endswith:
+    - .php
+    - .js
+    - .html
+  condition: selection_proc and selection_path and selection_ext
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.persistence
+- ai.llm
+- llm05.improper-output-handling
+---
+title: LLM Service Invoking Curl Or Wget Based On Model Output
+owasp top 10: LLM05:2025 Improper Output Handling
+id: a5196750-bf13-4b4d-a9d5-5a968dec907e
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /curl
+    - /wget
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.command-and-control
+- ai.llm
+- llm05.improper-output-handling
+---
+title: LLM Service Writing Files To Executable Or Cron Locations
+owasp top 10: LLM05:2025 Improper Output Handling
+id: dcc6578a-b1ee-497e-aa36-415f063319a6
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_target:
+    TargetFilename|contains:
+    - /etc/cron.
+    - /usr/local/bin/
+    - /etc/systemd/system/
+  condition: selection_proc and selection_target
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.persistence
+- ai.llm
+- llm05.improper-output-handling
+---
+title: LLM Service Invoking OCI Identity Or Policy Operations
+owasp top 10: LLM06:2025 Excessive Agency
+id: 4432ace3-066c-485b-a989-28b20d01a1fd
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /oci
+  selection_cmd:
+    CommandLine|contains:
+    - 'iam '
+    - 'policy '
+    - 'group '
+    - 'user '
+    - 'dynamic-group '
+    - auth token
+  condition: selection_parent and selection_child and selection_cmd
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.privilege-escalation
+- ai.llm
+- llm06.excessive-agency
+---
+title: LLM Service Running Sudo Or Su
+owasp top 10: LLM06:2025 Excessive Agency
+id: f471df4c-d020-4894-9430-9cefb9936654
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /sudo
+    - /su
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.privilege-escalation
+- ai.llm
+- llm06.excessive-agency
+---
+title: LLM Service Modifying Systemd Unit Or Service Config
+owasp top 10: LLM06:2025 Excessive Agency
+id: b261afbd-1260-4e5b-a8ff-e1e588c65bcc
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_target:
+    TargetFilename|contains:
+    - /etc/systemd/system/
+    - /lib/systemd/system/
+  condition: selection_proc and selection_target
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.persistence
+- ai.llm
+- llm06.excessive-agency
+---
+title: LLM Service Accessing Kubernetes Or OCI Cluster Config
+owasp top 10: LLM06:2025 Excessive Agency
+id: 26b51bb3-b028-444f-9238-9254063f25aa
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - /.kube/config
+    - /etc/kubernetes/
+    - /oke/
+    - /home/opc/.kube/
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.discovery
+- ai.llm
+- llm06.excessive-agency
+---
+title: LLM Service Creating Or Modifying SSH Authorized Keys
+owasp top 10: LLM06:2025 Excessive Agency
+id: d1cf8c16-e89b-45ed-a11e-b27f2d312a2d
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - authorized_keys
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: critical
+tags:
+- attack.persistence
+- ai.llm
+- llm06.excessive-agency
+---
+title: LLM Service Reading System Prompt Or Instruction Files
+owasp top 10: LLM07:2025 System Prompt Leakage
+id: 42d07bbb-437e-4303-8a81-f26320bbb430
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - system_prompt
+    - system-instructions
+    - prompt_templates
+    - base_prompt
+    - guardrails.yaml
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm07.system-prompt-leakage
+---
+title: LLM Service Copying Prompt Templates To Temp Or Public Path
+owasp top 10: LLM07:2025 System Prompt Leakage
+id: f430ceda-b9fe-400b-822e-3ac85cdd3266
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /cp
+    - /mv
+    - /rsync
+  selection_cmd:
+    CommandLine|contains:
+    - system_prompt
+    - prompt_templates
+    - guardrails
+  selection_dest:
+    CommandLine|contains:
+    - /tmp/
+    - /var/tmp/
+    - /srv/www/
+    - /var/www/
+  condition: selection_proc and selection_cmd and selection_dest
+fields:
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.exfiltration
+- ai.llm
+- llm07.system-prompt-leakage
+---
+title: LLM Service Serving Prompt Files Through Web Root
+owasp top 10: LLM07:2025 System Prompt Leakage
+id: 12acaa42-7d29-4322-8102-0c8ed036c4f1
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_target:
+    TargetFilename|contains:
+    - /var/www/
+    - /usr/share/nginx/html/
+    - /srv/www/
+  selection_name:
+    TargetFilename|contains:
+    - prompt
+    - system
+    - guardrail
+  condition: selection_proc and selection_target and selection_name
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.exfiltration
+- ai.llm
+- llm07.system-prompt-leakage
+---
+title: LLM Service Uploading Prompt Or Policy Files To OCI Object Storage
+owasp top 10: LLM07:2025 System Prompt Leakage
+id: 6ee34482-26de-4889-a312-3da960e9530a
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /oci
+  selection_cmd:
+    CommandLine|contains:
+    - object put
+    - os object put
+    - bucket
+  selection_hint:
+    CommandLine|contains:
+    - prompt
+    - system
+    - policy
+    - guardrail
+  condition: selection_parent and selection_child and selection_cmd and selection_hint
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.exfiltration
+- ai.llm
+- llm07.system-prompt-leakage
+---
+title: LLM Service Reading Secrets And Prompt Material In Same Execution Chain
+owasp top 10: LLM07:2025 System Prompt Leakage
+id: 72eac8a3-673f-4d7a-907f-d35de70f0b48
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /cat
+    - /grep
+    - /sed
+  selection_cmd:
+    CommandLine|contains:
+    - system_prompt
+    - guardrail
+    - .env
+    - .oci/config
+  condition: selection_parent and selection_child and selection_cmd
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm07.system-prompt-leakage
+---
+title: LLM Service Modifying Vector Database Files
+owasp top 10: LLM08:2025 Vector and Embedding Weaknesses
+id: e981e178-ddfa-43c4-bf39-2290356982df
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|endswith:
+    - .faiss
+    - .sqlite
+    - .db
+    - .parquet
+    - .jsonl
+  selection_hint:
+    TargetFilename|contains:
+    - vector
+    - embedding
+    - chroma
+    - qdrant
+    - faiss
+  condition: selection_proc and selection_file and selection_hint
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm08.vector-and-embedding-weaknesses
+---
+title: LLM Service Downloading Embeddings Or Index Files From External Host
+owasp top 10: LLM08:2025 Vector and Embedding Weaknesses
+id: 79df5875-4f9d-4a2f-8d4e-018e7f06e76d
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /curl
+    - /wget
+    - /python
+    - /python3
+  selection_cmd:
+    CommandLine|contains:
+    - .faiss
+    - .parquet
+    - .jsonl
+    - /embeddings/
+    - /vector/
+  filter_oci:
+    CommandLine|contains:
+    - oraclecloud.com
+    - oracle.com
+  condition: selection_proc and selection_cmd and not filter_oci
+fields:
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm08.vector-and-embedding-weaknesses
+---
+title: LLM Service Replacing Retrieval Index From Temp Path
+owasp top 10: LLM08:2025 Vector and Embedding Weaknesses
+id: b6068804-2816-4a5d-9441-b2ba121095f7
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_proc:
+    Image|endswith:
+    - /cp
+    - /mv
+    - /rsync
+  selection_cmd:
+    CommandLine|contains:
+    - /tmp/
+    - /var/tmp/
+  selection_target:
+    CommandLine|contains:
+    - vector
+    - embedding
+    - chroma
+    - faiss
+    - qdrant
+  condition: selection_proc and selection_cmd and selection_target
+fields:
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm08.vector-and-embedding-weaknesses
+---
+title: Unexpected Access To Retrieval Cache Or Memory Store
+owasp top 10: LLM08:2025 Vector and Embedding Weaknesses
+id: cca3d092-46e9-4fe7-84a8-a3cb885c7a85
+status: experimental
+logsource:
+  category: file_access
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_path:
+    TargetFilename|contains:
+    - /cache/
+    - /memory/
+    - /retrieval/
+    - /rag/
+  condition: selection_proc and selection_path
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm08.vector-and-embedding-weaknesses
+---
+title: LLM Service Network Connection To External Vector Or Search Platform
+owasp top 10: LLM08:2025 Vector and Embedding Weaknesses
+id: 0340733c-6394-41b3-b3b5-cb31453ac459
+status: experimental
+logsource:
+  category: network_connection
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_host:
+    DestinationHostname|contains:
+    - pinecone
+    - weaviate
+    - qdrant
+    - milvus
+    - elastic
+  filter_approved:
+    DestinationHostname|endswith:
+    - .oraclecloud.com
+    - .oracle.com
+    - .company.internal
+  condition: selection_proc and selection_host and not filter_approved
+fields:
+- Image
+- DestinationHostname
+- DestinationIp
+- User
+- ComputerName
+level: medium
+tags:
+- attack.command-and-control
+- ai.llm
+- llm08.vector-and-embedding-weaknesses
+---
+title: LLM Service Writing Answer Cache Or Response Store Outside Approved Path
+owasp top 10: LLM09:2025 Misinformation
+id: 3c667c7a-bcd2-4a97-a95c-2a10da4adbff
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - /responses/
+    - /answer-cache/
+    - /generated/
+  filter_allowed:
+    TargetFilename|contains:
+    - /opt/llm/responses/
+    - /srv/llm/responses/
+  condition: selection_proc and selection_file and not filter_allowed
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.impact
+- ai.llm
+- llm09.misinformation
+---
+title: LLM Service Updating Policy Or Moderation Rules Immediately Before Serving
+owasp top 10: LLM09:2025 Misinformation
+id: 5fba6ef3-372c-4539-a414-9d37488be1ec
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_file:
+    TargetFilename|contains:
+    - moderation
+    - policy
+    - safety_rules
+    - response_filter
+  condition: selection_proc and selection_file
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: medium
+tags:
+- attack.defense-evasion
+- ai.llm
+- llm09.misinformation
+---
+title: LLM Service Pulling External Content For Response Enrichment
+owasp top 10: LLM09:2025 Misinformation
+id: ee3253f9-851e-494b-828e-c7c5a3cc2d27
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /curl
+    - /wget
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.collection
+- ai.llm
+- llm09.misinformation
+---
+title: LLM Service Replacing Retrieval Corpus Files
+owasp top 10: LLM09:2025 Misinformation
+id: bce4d2bb-b17c-4d12-b352-78461623cb23
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_target:
+    TargetFilename|contains:
+    - /corpus/
+    - /knowledge/
+    - /rag/
+    - /docs-index/
+  condition: selection_proc and selection_target
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm09.misinformation
+---
+title: LLM Service Uploading Generated Content To OCI Object Storage
+owasp top 10: LLM09:2025 Misinformation
+id: b254843c-c5e2-4436-ace5-69426b28d455
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /oci
+  selection_cmd:
+    CommandLine|contains:
+    - object put
+    - os object put
+    - bucket
+  selection_hint:
+    CommandLine|contains:
+    - response
+    - answer
+    - summary
+    - report
+  condition: selection_parent and selection_child and selection_cmd and selection_hint
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: medium
+tags:
+- attack.exfiltration
+- ai.llm
+- llm09.misinformation
+---
+title: LLM Service Excessive Child Process Creation Seed
+owasp top 10: LLM10:2025 Unbounded Consumption
+id: 3561fc32-c59d-4854-8cd6-d3646aac34d9
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  condition: selection_parent
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: low
+tags:
+- attack.impact
+- ai.llm
+- llm10.unbounded-consumption
+---
+title: LLM Service Repeated External Connections Seed
+owasp top 10: LLM10:2025 Unbounded Consumption
+id: c433b85d-ddb4-44d3-97b6-68b6d7a03ca3
+status: experimental
+logsource:
+  category: network_connection
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  condition: selection_proc
+fields:
+- Image
+- DestinationHostname
+- DestinationIp
+- DestinationPort
+- User
+- ComputerName
+level: low
+tags:
+- attack.impact
+- ai.llm
+- llm10.unbounded-consumption
+---
+title: LLM Service Rapid Writes To Cache Or Temp Directories Seed
+owasp top 10: LLM10:2025 Unbounded Consumption
+id: 306459f3-6593-42d8-ba7a-7ba98a12a257
+status: experimental
+logsource:
+  category: file_event
+  product: linux
+detection:
+  selection_proc:
+    Image|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_path:
+    TargetFilename|contains:
+    - /tmp/
+    - /var/tmp/
+    - /cache/
+    - /dev/shm/
+  condition: selection_proc and selection_path
+fields:
+- Image
+- TargetFilename
+- User
+- ComputerName
+level: low
+tags:
+- attack.impact
+- ai.llm
+- llm10.unbounded-consumption
+---
+title: LLM Service Launching Multiple OCI CLI Commands Seed
+owasp top 10: LLM10:2025 Unbounded Consumption
+id: f2caaf23-8066-4ce2-a8d6-80b551886758
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection_parent:
+    ParentImage|contains:
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+  selection_child:
+    Image|endswith:
+    - /oci
+  condition: selection_parent and selection_child
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: low
+tags:
+- attack.impact
+- ai.llm
+- llm10.unbounded-consumption
+---
+title: LLM Service Recursive Self Spawn
+owasp top 10: LLM10:2025 Unbounded Consumption
+id: 24e33822-6f06-4566-800e-89fec4be0b05
+status: experimental
+logsource:
+  category: process_creation
+  product: linux
+detection:
+  selection:
+    Image|contains: &id001
+    - /opt/llm/
+    - /srv/llm/
+    - /app/llm/
+    - /models/
+    - /var/lib/llm/
+    - /home/opc/llm/
+    ParentImage|contains: *id001
+  condition: selection
+fields:
+- ParentImage
+- Image
+- CommandLine
+- User
+- ComputerName
+level: high
+tags:
+- attack.impact
+- ai.llm
+- llm10.unbounded-consumption
