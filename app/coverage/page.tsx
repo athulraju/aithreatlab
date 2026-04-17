@@ -384,6 +384,31 @@ export default function CoveragePage() {
             ))}
           </div>
         </motion.div>
+
+        {/* Attribution */}
+        <motion.div
+          className="mt-8 flex items-center gap-3 px-4 py-3.5 rounded-lg border border-white/[0.06] bg-white/[0.02]"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, ease }}
+        >
+          <CheckCircle2 className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+          <p className="text-xs text-gray-600">
+            Detection layer taxonomy informed by{" "}
+            <a
+              href="https://blogs.oracle.com/cloud-infrastructure/behind-the-scenes-logonomics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-gray-300 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
+            >
+              Behind the Scenes: Logonomics
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            {" "}— Oracle Cloud Infrastructure Blog.
+          </p>
+        </motion.div>
+
       </div>
     </div>
   );

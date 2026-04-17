@@ -15,7 +15,8 @@
       "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
       "Bash(grep -o \"className=\\\\\".*card-surface.*\\\\\"\" /Users/mydev/Desktop/detection-engineering-site/app/**/*.tsx)",
       "Bash(npm run:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(npm uninstall:*)"
     ]
   }
 }
