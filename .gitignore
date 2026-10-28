@@ -31,3 +31,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agent skills (local tooling, not part of the shipped app)
+.agents/skills/frontend-design
