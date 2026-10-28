@@ -4,9 +4,9 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "AIDetectLab | Detection Engineering Platform",
+  title: "AIThreatLab | Detection Engineering Platform",
   description:
-    "A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark, with a dedicated AI Security layer.",
+    "From security research to operational detection across AI security, architectural coverage, and intelligent security workflows.",
 };
 
 export default function RootLayout({
@@ -16,9 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-[#080810] text-white antialiased min-h-screen">
+      <body className="min-h-screen">
         <Navbar />
-        <main className="min-h-screen">{children}</main>
+        <main className="atl-page">{children}</main>
         <Footer />
       </body>
     </html>

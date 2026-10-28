@@ -3,7 +3,7 @@ import { MapPin, Mail, Linkedin, Github } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="pt-14 min-h-screen">
+    <div className="min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <p className="text-xs font-semibold text-cyan-400 uppercase tracking-widest mb-3">About</p>
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1 tracking-tight">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
 
@@ -11,12 +11,10 @@ const allLinks = [
   { href: "/detections",              label: "Detections" },
   { href: "/coverage",                label: "Coverage" },
   { href: "/ai-security",             label: "AI Security" },
-  { href: "/agent-skills",            label: "Agent Skills" },
+  { href: "/agent-skills",            label: "Agents" },
   { href: "/playground",              label: "Playground" },
   { href: "/converter",               label: "Converter" },
   { href: "/research",                label: "Research" },
-  { href: "/research-to-detection",   label: "R2D" },
-  { href: "/about",                   label: "About" },
 ];
 
 export function Navbar() {
@@ -24,23 +22,23 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#080810]/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#bce2d2]/[0.09] bg-[#05110f]/80 backdrop-blur-2xl">
+      <div className="atl-shell">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Logo />
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5" aria-label="Primary navigation">
             {allLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                  "px-3 py-2 text-[11px] font-medium tracking-wide transition-all",
                   pathname === link.href || pathname.startsWith(link.href + "/")
-                    ? "text-white bg-white/10"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                    ? "text-[#ece8df]"
+                    : "text-[#77736d] hover:text-[#ece8df]"
                 )}
               >
                 {link.label}
@@ -48,9 +46,15 @@ export function Navbar() {
             ))}
           </nav>
 
+          <div className="hidden items-center gap-2 lg:flex">
+            <Link href="/research-to-detection" className="inline-flex items-center gap-1.5 border-l border-[#bce2d2]/10 px-4 py-2 text-[11px] font-medium text-[#8da59b] transition-all hover:text-[#dce8e1]">
+              Research to detection <ArrowUpRight className="h-3.5 w-3.5 text-[#83d7b6]" />
+            </Link>
+          </div>
+
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden text-gray-400 hover:text-white"
+            className="rounded-lg border border-[#bce2d2]/10 p-2 text-[#8da59b] hover:text-white lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
@@ -61,8 +65,8 @@ export function Navbar() {
 
       {/* Mobile nav */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-white/[0.06] bg-[#080810] px-4 py-4">
-          {allLinks.map((link) => (
+        <div className="border-t border-[#bce2d2]/[0.08] bg-[#061411] px-4 py-4 shadow-2xl lg:hidden">
+          {[...allLinks, { href: "/research-to-detection", label: "Research to Detection" }, { href: "/about", label: "About" }].map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -70,8 +74,8 @@ export function Navbar() {
               className={cn(
                 "block px-3 py-2.5 rounded-md text-sm font-medium mb-1 transition-all",
                 pathname === link.href
-                  ? "text-white bg-white/10"
-                  : "text-gray-400 hover:text-white"
+                      ? "bg-[#83d7b6]/10 text-[#a6f1d1]"
+                      : "text-[#8da59b] hover:text-white"
               )}
             >
               {link.label}

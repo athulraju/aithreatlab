@@ -66,7 +66,7 @@ export default function AgentSkillsPage() {
     : "";
 
   return (
-    <div className="pt-14 min-h-screen bg-[#060609] relative overflow-hidden">
+    <div className="pt-14 min-h-screen bg-[#090a0a] relative overflow-hidden">
 
       {/* ── Ambient background blobs ──────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">

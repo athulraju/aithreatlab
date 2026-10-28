@@ -15,13 +15,13 @@ interface PageHeaderProps {
 }
 
 const accentStyles: Record<Accent, { eyebrow: string; rule: string }> = {
-  cyan:   { eyebrow: "text-cyan-400",    rule: "bg-cyan-500" },
-  blue:   { eyebrow: "text-blue-400",    rule: "bg-blue-500" },
-  purple: { eyebrow: "text-purple-400",  rule: "bg-purple-500" },
-  orange: { eyebrow: "text-orange-400",  rule: "bg-orange-500" },
-  yellow: { eyebrow: "text-yellow-400",  rule: "bg-yellow-500" },
-  green:  { eyebrow: "text-emerald-400", rule: "bg-emerald-500" },
-  gray:   { eyebrow: "text-gray-400",    rule: "bg-gray-600" },
+  cyan:   { eyebrow: "text-[#83d7b6]", rule: "bg-[#83d7b6]" },
+  blue:   { eyebrow: "text-[#83d7b6]", rule: "bg-[#83d7b6]" },
+  purple: { eyebrow: "text-[#83d7b6]", rule: "bg-[#83d7b6]" },
+  orange: { eyebrow: "text-[#d08a5d]", rule: "bg-[#d08a5d]" },
+  yellow: { eyebrow: "text-[#d08a5d]", rule: "bg-[#d08a5d]" },
+  green:  { eyebrow: "text-[#83d7b6]", rule: "bg-[#83d7b6]" },
+  gray:   { eyebrow: "text-[#8da59b]", rule: "bg-[#8da59b]" },
 };
 
 const ease = [0.25, 0.1, 0.25, 1] as const;
@@ -37,23 +37,23 @@ export function PageHeader({
   const styles = accentStyles[accent];
 
   return (
-    <div className={cn("mb-10", className)}>
+    <div className={cn("relative mb-10 max-w-3xl", className)}>
       {eyebrow && (
         <motion.div
-          className="flex items-center gap-2.5 mb-3"
+          className="mb-4 flex items-center gap-2.5"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease }}
         >
           <span className={cn("w-3 h-px rounded-full opacity-80", styles.rule)} />
-          <p className={cn("text-xs font-semibold uppercase tracking-widest", styles.eyebrow)}>
+          <p className={cn("font-mono text-[10px] font-medium tracking-[0.06em]", styles.eyebrow)}>
             {eyebrow}
           </p>
         </motion.div>
       )}
 
       <motion.h1
-        className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4"
+        className="mb-4 text-3xl font-medium leading-tight tracking-[-0.035em] text-[#e5eee9] sm:text-5xl"
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease, delay: 0.05 }}
@@ -63,7 +63,7 @@ export function PageHeader({
 
       {description && (
         <motion.p
-          className="text-gray-400 text-base max-w-2xl leading-relaxed"
+          className="max-w-2xl text-[15px] leading-7 text-[#8da59b]"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease, delay: 0.1 }}

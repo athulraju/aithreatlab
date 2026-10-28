@@ -18,7 +18,7 @@ export default function ResearchPage() {
       : researchSections.filter((s) => s.id === activeSection);
 
   return (
-    <div className="pt-14 min-h-screen">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <PageHeader
           eyebrow="Research"

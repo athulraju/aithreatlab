@@ -3,28 +3,29 @@ import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#080810] mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+    <footer className="atl-page-lineage border-t border-[#bce2d2]/[0.08] bg-[#030b09]">
+      <div className="atl-shell py-14">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <div className="mb-4">
               <Logo />
             </div>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-              A platform for building, translating, testing, and operationalizing detections across Sigma, Splunk, and PySpark.
+            <p className="max-w-sm text-sm leading-relaxed text-[#718a80]">
+              From security research to operational detection—across AI security, coverage, portable rules, and intelligent analyst workflows.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Platform</p>
+              <p className="mb-4 text-xs font-medium text-[#83d7b6]">Platform</p>
             <div className="space-y-2.5">
               {[
                 { href: "/converter", label: "Converter" },
                 { href: "/detections", label: "Detection Library" },
                 { href: "/coverage", label: "Coverage Framework" },
                 { href: "/playground", label: "Playground" },
+                { href: "/agent-skills", label: "Agent Workbench" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -38,11 +39,12 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Research</p>
+              <p className="mb-4 text-xs font-medium text-[#83d7b6]">Research</p>
             <div className="space-y-2.5">
               {[
                 { href: "/ai-security", label: "AI Security" },
                 { href: "/research", label: "Research" },
+                { href: "/research-to-detection", label: "Research to Detection" },
                 { href: "/about", label: "About" },
               ].map((link) => (
                 <Link
@@ -59,10 +61,10 @@ export function Footer() {
 
         <div className="border-t border-white/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-600">
-            © 2025 AIDetectLab. Detection engineering platform.
+            © {new Date().getFullYear()} AIThreatLab. Detection engineering platform.
           </p>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-gray-600">Built for defenders.</span>
+            <span className="text-xs text-gray-600">Research-informed. Defender-operated.</span>
           </div>
         </div>
       </div>

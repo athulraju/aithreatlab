@@ -235,7 +235,7 @@ function DetectionPreview() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function ResearchToDetectionPage() {
   return (
-    <main className="min-h-screen bg-[#080810]">
+    <main className="min-h-screen bg-[#090a0a]">
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden pt-28 pb-20">
