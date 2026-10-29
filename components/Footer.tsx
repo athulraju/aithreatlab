@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="atl-page-lineage border-t border-[#bce2d2]/[0.08] bg-[#030b09]">
       <div className="atl-shell py-14">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-10 mb-12">
           {/* Brand */}
           <div className="md:col-span-3">
             <div className="mb-4">
@@ -26,7 +26,6 @@ export function Footer() {
                 { href: "/coverage", label: "Coverage Framework" },
                 { href: "/playground", label: "Playground" },
                 { href: "/agent-skills", label: "Agent Workbench" },
-                { href: "/agents/logforge", label: "LogForge AI" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -45,8 +44,27 @@ export function Footer() {
               {[
                 { href: "/ai-security", label: "AI Security" },
                 { href: "/research", label: "Research" },
-                { href: "/research-to-detection", label: "Research to Detection" },
                 { href: "/about", label: "About" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="block text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+              <p className="mb-4 text-xs font-medium text-[#83d7b6]">Labs</p>
+            <div className="space-y-2.5">
+              {[
+                { href: "/labs", label: "Overview" },
+                { href: "/research-to-detection", label: "Research2Defense" },
+                { href: "/agents/logforge", label: "LogForge AI" },
+                { href: "/agents/minority-lens", label: "Minority Lens" },
               ].map((link) => (
                 <Link
                   key={link.href}

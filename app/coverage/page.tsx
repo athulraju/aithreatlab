@@ -78,11 +78,46 @@ function sortItems(items: CoverageItem[], key: SortKey, dir: SortDir): CoverageI
   });
 }
 
+function MethodologyTab() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease }}
+    >
+      <div className="card-surface p-8 max-w-3xl">
+        <p className="text-xs font-medium text-purple-400 mb-3">
+          Oracle Cloud Infrastructure Blog · Behind the Scenes with OCI Engineering
+        </p>
+        <h2 className="text-xl font-semibold text-white mb-2 leading-snug">
+          Behind the Scenes: Beyond the Coverage Map—Measuring Cloud Detection Coverage
+        </h2>
+        <p className="text-xs text-gray-500 mb-5">Written by the author of this site, on the Oracle Cloud Infrastructure Blog.</p>
+        <p className="text-sm text-gray-400 leading-relaxed mb-6">
+          A piece on detection coverage measurement in cloud environments, published as part of
+          Oracle&apos;s &quot;Behind the Scenes with OCI Engineering&quot; series. Read the full post for the
+          detail — this page doesn&apos;t attempt to summarize its arguments.
+        </p>
+        <a
+          href="https://blogs.oracle.com/cloud-infrastructure/behind-the-scenes-cloud-detection-coverage"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-sm text-gray-300 hover:text-white transition-all duration-200"
+        >
+          Read the full post
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function CoveragePage() {
   const [selectedLayer, setSelectedLayer] = useState<string>("All");
   const [showAiOnly,    setShowAiOnly]    = useState(false);
   const [sortKey,       setSortKey]       = useState<SortKey | null>(null);
   const [sortDir,       setSortDir]       = useState<SortDir>("asc");
+  const [activeTab,     setActiveTab]     = useState<"map" | "methodology">("map");
 
   useEffect(() => { document.title = "Coverage Framework | AIDetectLab"; }, []);
 
@@ -130,6 +165,31 @@ export default function CoveragePage() {
             Export CSV
           </motion.button>
         </div>
+
+        {/* Tabs */}
+        <div className="flex items-center gap-1 mb-8 border-b border-white/[0.06]">
+          {([
+            { id: "map" as const, label: "Coverage Map" },
+            { id: "methodology" as const, label: "Methodology" },
+          ]).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${
+                activeTab === tab.id ? "text-white" : "text-gray-500 hover:text-gray-300"
+              }`}
+            >
+              {tab.label}
+              {activeTab === tab.id && (
+                <motion.div layoutId="coverage-tab" className="absolute inset-x-0 -bottom-px h-0.5 bg-cyan-400" transition={{ duration: 0.2, ease }} />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "methodology" && <MethodologyTab />}
+
+        {activeTab === "map" && <>
 
         {/* Summary Stats with count-up */}
         <motion.div
@@ -408,6 +468,8 @@ export default function CoveragePage() {
             {" "}— Oracle Cloud Infrastructure Blog.
           </p>
         </motion.div>
+
+        </>}
 
       </div>
     </div>

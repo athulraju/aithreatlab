@@ -47,8 +47,8 @@ export function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Link href="/research-to-detection" className="inline-flex items-center gap-1.5 border-l border-[#bce2d2]/10 px-4 py-2 text-[11px] font-medium text-[#8da59b] transition-all hover:text-[#dce8e1]">
-              Research to detection <ArrowUpRight className="h-3.5 w-3.5 text-[#83d7b6]" />
+            <Link href="/labs" className="inline-flex items-center gap-1.5 border-l border-[#bce2d2]/10 px-4 py-2 text-[11px] font-medium text-[#8da59b] transition-all hover:text-[#dce8e1]">
+              Labs <ArrowUpRight className="h-3.5 w-3.5 text-[#83d7b6]" />
             </Link>
           </div>
 
@@ -66,7 +66,7 @@ export function Navbar() {
       {/* Mobile nav */}
       {mobileOpen && (
         <div className="border-t border-[#bce2d2]/[0.08] bg-[#061411] px-4 py-4 shadow-2xl lg:hidden">
-          {[...allLinks, { href: "/research-to-detection", label: "Research to Detection" }, { href: "/about", label: "About" }].map((link) => (
+          {[...allLinks, { href: "/labs", label: "Labs" }, { href: "/about", label: "About" }].map((link) => (
             <Link
               key={link.href}
               href={link.href}
