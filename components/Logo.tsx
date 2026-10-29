@@ -11,7 +11,7 @@ export function Logo({ className, linkClassName }: LogoProps) {
   return (
     <Link href="/" className={`flex items-center gap-2 group ${linkClassName ?? ""}`}>
       <div className={`flex items-center gap-2 ${className ?? ""}`}>
-        {/* Three converging traces: research, logic, and coverage. */}
+        {/* Radar lock: a dish, one sweep, and the point it's found. */}
         <svg
           width="22"
           height="22"
@@ -20,11 +20,15 @@ export function Logo({ className, linkClassName }: LogoProps) {
           aria-hidden="true"
           className="flex-shrink-0"
         >
-          <path d="M2 5.5C7 5.5 7.5 11 12 11S16 7 20 7" stroke="#83d7b6" strokeWidth="1.25" strokeLinecap="round"/>
-          <path d="M2 11C6.5 11 8 11 12 11s4 4 8 4" stroke="#d08a5d" strokeOpacity=".82" strokeWidth="1" strokeLinecap="round"/>
-          <path d="M2 16.5C7 16.5 7.5 11 12 11s4-1 8-1" stroke="#83d7b6" strokeOpacity=".4" strokeWidth="1" strokeLinecap="round"/>
-          <circle cx="12" cy="11" r="2.15" fill="#a6f1d1"/>
-          <circle cx="20" cy="7" r="1" fill="#d08a5d"/>
+          <circle cx="11" cy="11" r="8.5" stroke="#83d7b6" strokeWidth="1.1" strokeOpacity=".9"/>
+          <circle cx="11" cy="11" r="5" stroke="#d08a5d" strokeWidth="1" strokeOpacity=".75"/>
+          <g
+            className="origin-[11px_11px] transition-none group-hover:animate-[spin_2.4s_linear_infinite] motion-reduce:group-hover:animate-none"
+          >
+            <line x1="11" y1="11" x2="11" y2="2.5" stroke="#83d7b6" strokeWidth="1.3" strokeLinecap="round"/>
+            <circle cx="11" cy="2.5" r="1.1" fill="#d08a5d"/>
+          </g>
+          <circle cx="11" cy="11" r="1.8" fill="#a6f1d1"/>
         </svg>
 
         {/* Wordmark */}
