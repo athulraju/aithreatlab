@@ -26,6 +26,7 @@ export function Footer() {
                 { href: "/coverage", label: "Coverage Framework" },
                 { href: "/playground", label: "Playground" },
                 { href: "/agent-skills", label: "Agent Workbench" },
+                { href: "/agents/logforge", label: "LogForge AI" },
               ].map((link) => (
                 <Link
                   key={link.href}
