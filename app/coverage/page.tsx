@@ -90,13 +90,13 @@ function MethodologyTab() {
           Oracle Cloud Infrastructure Blog · Behind the Scenes with OCI Engineering
         </p>
         <h2 className="text-xl font-semibold text-white mb-2 leading-snug">
-          Behind the Scenes: Beyond the Coverage Map—Measuring Cloud Detection Coverage
+          Behind the Scenes: Beyond the Coverage Map, Measuring Cloud Detection Coverage
         </h2>
         <p className="text-xs text-gray-500 mb-5">Written by the author of this site, on the Oracle Cloud Infrastructure Blog.</p>
         <p className="text-sm text-gray-400 leading-relaxed mb-6">
           A piece on detection coverage measurement in cloud environments, published as part of
           Oracle&apos;s &quot;Behind the Scenes with OCI Engineering&quot; series. Read the full post for the
-          detail — this page doesn&apos;t attempt to summarize its arguments.
+          detail; this page doesn&apos;t attempt to summarize its arguments.
         </p>
         <a
           href="https://blogs.oracle.com/cloud-infrastructure/behind-the-scenes-cloud-detection-coverage"
@@ -465,7 +465,7 @@ export default function CoveragePage() {
               Behind the Scenes: Logonomics
               <ExternalLink className="w-3 h-3" />
             </a>
-            {" "}— Oracle Cloud Infrastructure Blog.
+            {", "}Oracle Cloud Infrastructure Blog.
           </p>
         </motion.div>
 

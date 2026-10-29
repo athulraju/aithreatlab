@@ -12,7 +12,7 @@ export function Footer() {
               <Logo />
             </div>
             <p className="max-w-sm text-sm leading-relaxed text-[#718a80]">
-              From security research to operational detection—across AI security, coverage, portable rules, and intelligent analyst workflows.
+              From security research to operational detection, across AI security, coverage, portable rules, and intelligent analyst workflows.
             </p>
           </div>
 

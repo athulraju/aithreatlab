@@ -647,7 +647,7 @@ tags:
     ],
     requiredFields: ["image", "target_filename", "user", "computer_name"],
     falsePositives: [
-      "LLM service reading its own .env file during initialisation — expected on first start",
+      "LLM service reading its own .env file during initialisation, expected on first start",
     ],
     tuningGuidance:
       "Exclude reads at process startup time (within 30s of service start). Alert on reads that occur during active request processing.",
@@ -2362,7 +2362,7 @@ tags:
     id: "llm06-005",
     title: "LLM Service Creating Or Modifying SSH Authorized Keys",
     description:
-      "Detects LLM service processes writing to SSH authorized_keys files. This is a critical indicator — adding attacker-controlled public keys enables persistent, password-less SSH access to the host, representing the most severe excessive agency outcome.",
+      "Detects LLM service processes writing to SSH authorized_keys files. This is a critical indicator: adding attacker-controlled public keys enables persistent, password-less SSH access to the host, representing the most severe excessive agency outcome.",
     platform: ["Linux", "AI/ML"],
     mitre: ["T1098.004"],
     category: "AI Security",
@@ -3095,7 +3095,7 @@ tags:
       "Index rebuild scripts that use /tmp as a staging area before atomic replacement",
     ],
     tuningGuidance:
-      "Implement a canary file approach — include a known-good embedding in the index and alert if retrieval quality drops after an index replacement event.",
+      "Implement a canary file approach: include a known-good embedding in the index and alert if retrieval quality drops after an index replacement event.",
     deploymentNotes:
       "Vector index replacement should follow an approved pipeline with integrity verification. Use checksums or digital signatures on index files before deploying them.",
     evasionConsiderations:

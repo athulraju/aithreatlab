@@ -38,7 +38,7 @@ const projects = [
     id: "minority-lens",
     name: "Minority Lens",
     tagline: "Finding signals in the rarest events.",
-    desc: "A private research project born out of a year of graduate AI research. Not open source — reach out if you'd like a look.",
+    desc: "A private research project born out of a year of graduate AI research. Not open source; reach out if you'd like a look.",
     href: "/agents/minority-lens",
     github: null,
     accent: "#d08a5d",
@@ -55,7 +55,7 @@ export default function LabsPage() {
         <PageHeader
           eyebrow="Labs"
           title="Standalone tools from AIThreatLab."
-          description="Local-first, Ollama-powered AI agents — each its own open-source repo, independent of this site, built with the same verify-before-generate philosophy."
+          description="Local-first, Ollama-powered AI agents, each its own project independent of this site, built with the same verify-before-generate philosophy."
           accent="green"
         />
 
@@ -140,7 +140,7 @@ export default function LabsPage() {
         >
           <p className="text-xs text-gray-600">
             Research2Defense and LogForge AI are open source, self-hosted, and run entirely on your own machine against a local Ollama model.
-            Minority Lens is a private project — reach out if you&apos;d like to see it.
+            Minority Lens is a private project; reach out if you&apos;d like to see it.
           </p>
         </motion.div>
       </div>

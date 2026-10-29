@@ -22,7 +22,7 @@ const ease = [0.25, 0.1, 0.25, 1] as const;
 
 const pipeline = [
   { num: "01", icon: Workflow, title: "Describe the activity", desc: "Plain language: \"User Alice modifies an IAM policy\" plus a provider, time window, and event count." },
-  { num: "02", icon: Database, title: "Deterministic scenario match", desc: "Keyword-matched against a verified schema registry — the model never decides which event type to impersonate." },
+  { num: "02", icon: Database, title: "Deterministic scenario match", desc: "Keyword-matched against a verified schema registry, so the model never decides which event type to impersonate." },
   { num: "03", icon: Cpu, title: "Local Ollama generation", desc: "Structured JSON generation against a local model, streamed with real incremental progress." },
   { num: "04", icon: Clock, title: "Deterministic normalization", desc: "Timestamp ordering/range and per-actor identity consistency enforced in code, not left to the model." },
   { num: "05", icon: ShieldCheck, title: "Schema validation", desc: "Every event's fields and operation name are checked against the matched scenario before it's returned." },
@@ -30,11 +30,11 @@ const pipeline = [
 ];
 
 const features = [
-  { icon: Database, title: "Verified Schema Registry", desc: "12 scenarios across OCI, AWS, and Azure, each backed by real provider documentation — no invented event types.", accent: "mint" },
+  { icon: Database, title: "Verified Schema Registry", desc: "12 scenarios across OCI, AWS, and Azure, each backed by real provider documentation, with no invented event types.", accent: "mint" },
   { icon: Cpu, title: "Streaming, Honest Progress", desc: "Real character counts from the model as it generates, not a fabricated percentage bar.", accent: "amber" },
   { icon: Clock, title: "Deterministic Normalization", desc: "Timestamp ordering and multi-actor identity consistency are enforced in code, independent of the model.", accent: "mint" },
   { icon: ShieldCheck, title: "Refuses to Fabricate", desc: "If a request doesn't match a verified scenario, it says so instead of generating a plausible-looking but unverified event.", accent: "amber" },
-  { icon: Server, title: "Fully Local", desc: "No database, no queue, no cloud dependency — a Next.js API route and a local Ollama call.", accent: "mint" },
+  { icon: Server, title: "Fully Local", desc: "No database, no queue, no cloud dependency: just a Next.js API route and a local Ollama call.", accent: "mint" },
   { icon: FileJson, title: "JSON / JSONL Export", desc: "Copy or download results in either format, ready for SIEM ingestion or parser tests.", accent: "amber" },
 ];
 
@@ -79,7 +79,7 @@ export default function LogForgeAboutPage() {
           >
             <span className="text-white">Log</span>
             <span className="text-[#83d7b6]">Forge</span>
-            <span className="text-gray-600 mx-3 font-light">—</span>
+            <span className="text-gray-600 mx-3 font-light">·</span>
             <span className="text-white">AI</span>
           </motion.h1>
 
@@ -90,7 +90,7 @@ export default function LogForgeAboutPage() {
             transition={{ duration: 0.45, ease, delay: 0.16 }}
           >
             Describe a cloud security activity in plain language. Get back a realistic,
-            chronological, schema-verified synthetic audit log timeline — entirely local,
+            chronological, schema-verified synthetic audit log timeline, entirely local,
             powered by Ollama, no cloud API required.
           </motion.p>
 
@@ -135,8 +135,8 @@ export default function LogForgeAboutPage() {
               you ask them to role-play one. LogForge doesn&apos;t let the model make that call:
               every scenario is backed by a JSON template whose operation names, required
               fields, and log source trace back to the provider&apos;s own documentation. If a
-              request doesn&apos;t match a verified scenario, LogForge says so — it doesn&apos;t
-              fabricate one.
+              request doesn&apos;t match a verified scenario, LogForge says so instead of
+              fabricating one.
             </p>
           </motion.div>
         </div>
@@ -187,7 +187,7 @@ export default function LogForgeAboutPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="text-center mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">12 verified scenarios</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">Each one traces to real provider documentation — see each template&apos;s <code className="text-[#83d7b6]">docReference</code> in the repo.</p>
+            <p className="text-gray-500 max-w-xl mx-auto">Each one traces to real provider documentation; see each template&apos;s <code className="text-[#83d7b6]">docReference</code> in the repo.</p>
           </motion.div>
           <motion.div className="grid grid-cols-1 sm:grid-cols-3 gap-4" variants={staggerContainer(0.08)} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             {scenarios.map((group) => (

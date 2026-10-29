@@ -17,12 +17,12 @@ const curiosities = [
   {
     icon: GraduationCap,
     title: "A year of focus",
-    desc: "Minority Lens grew out of a full year of graduate research in AI — not a weekend project, and not a product pitch.",
+    desc: "Minority Lens grew out of a full year of graduate research in AI, not a weekend project or a product pitch.",
   },
   {
     icon: Lock,
     title: "Kept close for now",
-    desc: "It's private while it matures. No public repo, no install guide here — just an invitation to talk about it.",
+    desc: "It's private while it matures. No public repo, no install guide here, just an invitation to talk about it.",
   },
 ];
 
@@ -78,7 +78,7 @@ export default function MinorityLensAboutPage() {
           >
             A private research project exploring how machine learning systems can find signal
             when the thing you care about is an extreme minority in the data. Born out of a year
-            of graduate research in AI. Not public, by design — if it sounds interesting,
+            of graduate research in AI. Not public, by design. If it sounds interesting,
             I&apos;d rather tell you about it directly.
           </motion.p>
 
