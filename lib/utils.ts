@@ -56,6 +56,11 @@ export function platformColor(platform: string): string {
       return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
     case "ai/ml":
       return "text-purple-400 bg-purple-400/10 border-purple-400/20";
+    case "macos":
+      return "text-slate-300 bg-slate-400/10 border-slate-400/20";
+    case "kubernetes":
+    case "container":
+      return "text-sky-400 bg-sky-400/10 border-sky-400/20";
     default:
       return "text-gray-400 bg-gray-400/10 border-gray-400/20";
   }

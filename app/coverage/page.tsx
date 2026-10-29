@@ -421,9 +421,9 @@ export default function CoveragePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { title: "macOS Endpoint Coverage",       desc: "Limited detection coverage for macOS-specific threats. Priority area for expansion.", severity: "high" },
-              { title: "Container / Kubernetes Layer",   desc: "No dedicated container runtime or Kubernetes audit log detections in current framework.", severity: "high" },
-              { title: "LLM Output Monitoring",          desc: "DLP integration for monitoring LLM response content not yet implemented.", severity: "medium" },
+              { title: "Mobile Endpoint Coverage (iOS/Android)", desc: "No dedicated jailbreak/root, malicious profile, or mobile malware detections yet. Verified zero coverage during the 2026-10-29 gap review.", severity: "high" },
+              { title: "Direct Database Audit Layer",            desc: "Coverage is perimeter/application-layer only (WAF, SaaS audit logs). No native database-engine audit log ingestion for anomalous direct queries or exports.", severity: "medium" },
+              { title: "Email / SMTP Gateway Coverage",          desc: "Existing M365 coverage is inbox-rule/BEC focused at the application layer. No transport-layer secure email gateway detection yet.", severity: "medium" },
             ].map((gap, i) => (
               <motion.div
                 key={gap.title}
