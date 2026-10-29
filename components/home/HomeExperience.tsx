@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, BookOpen, Braces, FlaskConical, Layers3, Shield, Workflow } from "lucide-react";
 import styles from "./HomeExperience.module.css";
 import { StreamFlowCanvas } from "./StreamFlowCanvas";
+import { detections } from "@/lib/data/detections";
 
 type HomeExperienceProps = {
   detection: { id: string; title: string; category: string; severity: string; sigma: string };
@@ -11,7 +12,7 @@ type HomeExperienceProps = {
 };
 
 const metrics = [
-  ["110", "Detection Rules"], ["8", "Coverage Layers"], ["3", "Output Formats"], ["OWASP", "LLM & Agentic Top 10"],
+  [String(detections.length), "Detection Rules"], ["8", "Coverage Layers"], ["3", "Output Formats"], ["OWASP", "LLM & Agentic Top 10"],
 ] as const;
 
 const capabilities = [
