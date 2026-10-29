@@ -38,13 +38,13 @@ const projects = [
     id: "minority-lens",
     name: "Minority Lens",
     tagline: "Finding signals in the rarest events.",
-    desc: "An experimentation platform for evaluating supervised, hybrid, and anomaly-based ML pipelines on highly imbalanced datasets — grounded in MSc thesis research on insider-threat detection.",
+    desc: "A private research project born out of a year of graduate AI research. Not open source — reach out if you'd like a look.",
     href: "/agents/minority-lens",
     github: null,
     accent: "#d08a5d",
     accentBorder: "border-[#d08a5d]/25",
     accentBg: "bg-[#d08a5d]/8",
-    stack: ["FastAPI", "PyTorch", "Next.js"],
+    stack: [],
   },
 ] as const;
 
@@ -123,7 +123,7 @@ export default function LabsPage() {
                   </a>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-gray-600 text-xs font-medium cursor-default">
-                    GitHub — publishing soon
+                    Private
                   </span>
                 )}
               </div>
@@ -139,8 +139,8 @@ export default function LabsPage() {
           viewport={{ once: true }}
         >
           <p className="text-xs text-gray-600">
-            All three projects are open source, self-hosted, and run entirely on your own machine against a local Ollama model.
-            Minority Lens&apos; repository is in final preparation and will be linked here once published.
+            Research2Defense and LogForge AI are open source, self-hosted, and run entirely on your own machine against a local Ollama model.
+            Minority Lens is a private project — reach out if you&apos;d like to see it.
           </p>
         </motion.div>
       </div>
