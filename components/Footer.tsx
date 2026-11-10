@@ -65,6 +65,7 @@ export function Footer() {
                 { href: "/research-to-detection", label: "Research2Defense" },
                 { href: "/agents/logforge", label: "LogForge AI" },
                 { href: "/agents/minority-lens", label: "Minority Lens" },
+                { href: "/agents/blast-radius", label: "Blast Radius" },
               ].map((link) => (
                 <Link
                   key={link.href}

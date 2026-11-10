@@ -46,6 +46,18 @@ const projects = [
     accentBg: "bg-[#d08a5d]/8",
     stack: [],
   },
+  {
+    id: "blast-radius",
+    name: "Blast Radius",
+    tagline: "The architecture is the attack surface.",
+    desc: "A private research project on scoring AI systems by how their architecture behaves. Not open source; reach out if you'd like a look.",
+    href: "/agents/blast-radius",
+    github: null,
+    accent: "#e0625f",
+    accentBorder: "border-[#e0625f]/25",
+    accentBg: "bg-[#e0625f]/8",
+    stack: [],
+  },
 ] as const;
 
 export default function LabsPage() {
@@ -81,7 +93,7 @@ export default function LabsPage() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+          className="grid grid-cols-1 md:grid-cols-2 gap-5"
           variants={staggerContainer(0.08)}
           initial="hidden"
           whileInView="visible"
@@ -140,7 +152,7 @@ export default function LabsPage() {
         >
           <p className="text-xs text-gray-600">
             Research2Defense and LogForge AI are open source, self-hosted, and run entirely on your own machine against a local Ollama model.
-            Minority Lens is a private project; reach out if you&apos;d like to see it.
+            Minority Lens and Blast Radius are private projects; reach out if you&apos;d like to see either one.
           </p>
         </motion.div>
       </div>
